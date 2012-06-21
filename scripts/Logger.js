@@ -26,7 +26,7 @@ define(["Compose"], function(Compose) {
 			entry.className = 'log-entry';
 			entry.innerHTML = json;
 			this.entries.push(entry);
-			this.logDiv.appendChild(entry);
+			this.logDiv.insertBefore(entry, this.logDiv.childNodes[0]);
 			this.trimEntries();
 		},
 		
