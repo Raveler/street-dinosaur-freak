@@ -2,6 +2,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 	
 	var Game = Compose(function constructor() {
 		
+		// first time
+		this.firstTime = true;
+
 		// width, height
 		this.width = 1000;
 		this.height = 600;
@@ -15,7 +18,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		this.canvas.height = this.height;
 
 		// Load images
-		var imagesFileNames=["buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingTop1", "buildingTop2"];
+		var imagesFileNames=["buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingTop1", "buildingTop2", "dino/body", "dino/headClosed", "dino/neckPart", "dino/headOpen"];
 		this.loadImages(imagesFileNames);
 
 		// Load json data
@@ -36,19 +39,36 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		this.keys = {};
 		this.keyDown = function(e) {
 			var ch = String.fromCharCode(e.keyCode);
-			this.keys[ch] = true;
+			this.keys['key' + e.keyCode] = true;
+			if (e.keyCode != 116) e.preventDefault();
 		};
 		
 		this.keyUp = function(e) {
 			var ch = String.fromCharCode(e.keyCode);
-			this.keys[ch] = false;
+			this.keys['key' + e.keyCode] = false;
+			if (e.keyCode != 116) e.preventDefault();
 		};
 		
 		document.onkeydown = this.keyDown.bind(this);
 		document.onkeyup = this.keyUp.bind(this);
 	},
 	{
+		getImage: function(name) {
+			return this.images[name];
+		},
+
 		update: function() {
+
+			if (!(this.imagesPending == 0) || !(this.jsonPending == 0)) {
+				return;
+			}
+
+			if (this.firstTime) {
+				this.dino.init(this);
+				this.firstTime = false;
+			}
+
+
 			var ctx = this.canvas.getContext('2d');  
 			//ctx.clearRect(0, 0, this.width, this.height);
 			ctx.fillStyle = "rgb(135, 206, 250)";
@@ -56,22 +76,33 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			//this.background.draw(ctx);
 
 			this.update_karel();
-			this.update_dave();
+			//this.update_dave();
+		},
+
+		isKeyDown: function(c) {
+			return this.keys['key' + c.charCodeAt(0)];
 		},
 
 		update_karel: function() {
+
+
 			var ctx = this.canvas.getContext('2d');
 			ctx.save();
-
+			//Logger.log(this.keys);
 			// update the different chars
-			if (this.keys['A']) this.dino.issueCommand('moveLeg', 'LEFT', 'BACK', false);
-			if (this.keys['Z']) this.dino.issueCommand('moveLeg', 'LEFT', 'BACK', true);
-			if (this.keys['E']) this.dino.issueCommand('moveLeg', 'RIGHT', 'BACK', false);
-			if (this.keys['R']) this.dino.issueCommand('moveLeg', 'RIGHT', 'BACK', true);
-			if (this.keys['Q']) this.dino.issueCommand('moveLeg', 'LEFT', 'FRONT', false);
-			if (this.keys['S']) this.dino.issueCommand('moveLeg', 'LEFT', 'FRONT', true);
-			if (this.keys['D']) this.dino.issueCommand('moveLeg', 'RIGHT', 'FRONT', false);
-			if (this.keys['F']) this.dino.issueCommand('moveLeg', 'RIGHT', 'FRONT', true);
+			if (this.isKeyDown('A')) this.dino.issueCommand('moveLeg', 0, false);
+			else if (this.isKeyDown('Z')) this.dino.issueCommand('moveLeg', 0, true);
+			else if (this.isKeyDown('E')) this.dino.issueCommand('moveLeg', 1, false);
+			else if (this.isKeyDown('R')) this.dino.issueCommand('moveLeg', 1, true);
+			else if (this.isKeyDown('Q')) this.dino.issueCommand('moveLeg', 3, false);
+			else if (this.isKeyDown('S')) this.dino.issueCommand('moveLeg', 3, true);
+			else if (this.isKeyDown('D')) this.dino.issueCommand('moveLeg', 2, false);
+			else if (this.isKeyDown('F')) this.dino.issueCommand('moveLeg', 2, true);
+			if (this.keys['key37']) this.dino.issueCommand('moveHead', new Vector2(-1, 0));
+			if (this.keys['key38']) this.dino.issueCommand('moveHead', new Vector2(0, -1));
+			if (this.keys['key39']) this.dino.issueCommand('moveHead', new Vector2(1, 0));
+			if (this.keys['key40']) this.dino.issueCommand('moveHead', new Vector2(0, 1));
+			
 
 			// draw the ground
 			ctx.fillStyle = "#00ffff";
@@ -97,7 +128,6 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
         	this.images = new Array();
         	this.imagesPending = fileNames.length;
         	for(var i = 0, length = fileNames.length; fileName = fileNames[i], i < length; i++) {
-				Logger.log(fileName);
 				require(["image!data/" + fileName + '.png'], this.imageLoaded.bind(this, fileName));
 			}
         },
@@ -106,14 +136,14 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			this.ship = img;
 			this.imagesPending--;
 			this.images[fileName] = img;
-			Logger.log('image loaded: ' + fileName + ' - ' + img);
+			//Logger.log('image loaded: ' + fileName + ' - ' + img);
 		},
 
 		loadJson: function(fileNames) {
 			this.json = new Array();
 			this.jsonPending = fileNames.length;
 			for(var i = 0, length = fileNames.length; fileName = fileNames[i], i < length; i++) {
-				Logger.log(fileName);
+				//Logger.log(fileName);
 				require(["json!" + fileName], this.jsonLoaded.bind(this, fileName));
 			}
 		},

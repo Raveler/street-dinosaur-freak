@@ -1,13 +1,15 @@
 define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger, Vector2, Controller) {
 
-	var DinoLeg = Compose(function(attachLoc, pose, depth, dino) {
+	var DinoLeg = Compose(function(attachLoc, initialOffset, dino, idx, color) {
+
+		// index
+		this.idx = idx;
 
 		// dino
 		this.dino = dino;
 
-		// pose, depth
-		this.pose = pose;
-		this.depth = depth;
+		// step size
+		this.stepSize = 50;
 
 		// some constants
 		this.maxLegLength = 60; // maximum length - defines step size
@@ -17,87 +19,132 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 		// our attach location
 		this.attachLoc = attachLoc;
 
-		// current offset
-		this.floorLoc = this.dino.getLegRootLoc(this.attachLoc);
-		this.floorLoc.y += this.legHeight;
+		// moving?
+		this.moving = false;
 
-		// depending on the pose, we update the floor loc
-		if (pose == 'LEFT') this.floorLoc.x -= Math.sqrt(this.maxLegLength*this.maxLegLength - this.legHeight*this.legHeight);
-		else if (pose == 'RIGHT') this.floorLoc.x += Math.sqrt(this.maxLegLength*this.maxLegLength - this.legHeight*this.legHeight);
-		if (depth == 'FRONT') this.color = '#FFFF00';
-		else this.color = '#AEB404';
+		// initial offset
+		if (initialOffset == -2) this.initialOffset = -this.stepSize/2;
+		if (initialOffset == -1) this.initialOffset = -this.stepSize/3/2;
+		if (initialOffset == 1) this.initialOffset = this.stepSize/3/2;
+		if (initialOffset == 2) this.initialOffset = this.stepSize/2;
+
+		//this.initialOffset = this.stepSize / 3 * (initialOffset+2) - this.stepSize/2;
+		Logger.log(this.initialOffset);
+		// current offset
+		this.offset = this.initialOffset;
+
+		// color
+		this.color = color;
 	},
 	{
-		getLegLength: function() {
-			var rootLoc = this.dino.getLegRootLoc(this.attachLoc);
-			return rootLoc.subtract(this.floorLoc).length();
+		init: function(game) {
+
+		},
+		
+		getFloorLoc: function() {
+			var legRootLoc = this.getLegRootLoc();
+			return new Vector2(legRootLoc.x + this.offset, legRootLoc.y + this.legHeight);
+		},
+
+		getLegOffset: function() {
+			return this.offset;
+		},
+
+		getLegRootLoc: function() {
+			return this.dino.getLegRootLoc(this.attachLoc);
+		},
+
+		isMovable: function() {
+			return Math.abs(this.getLegOffset()) + 0.00001 > this.stepSize/2;
+		},
+
+		isMoving: function() {
+			return this.moving;
 		},
 
 		moveForward: function() {
 
-			// make sure this is legal leg movement
-			var rootLoc = this.dino.getLegRootLoc(this.attachLoc);
-			var legLength = this.floorLoc.add(new Vector2(this.moveSpeed, 0)).subtract(rootLoc).length();
-			if (legLength > this.maxLegLength) return;
-			// make sure it is also legal for all other legs
-			var ok = this.dino.updateBody(this.moveSpeed/4);
-			if (!ok) return;
+			// not movable - skip
+			if (!this.moving && !this.isMovable()) return;
 
-			// update position
-			this.floorLoc.x += this.moveSpeed;
+			// we can move, but another leg is moving - skip
+			if (!this.moving && this.dino.hasMovingLeg()) return;
+
+			// we are definitely moving now
+			this.moving = true;
+
+			// we update our position in the right direction
+			var prevOffset = this.offset;
+			this.offset += this.moveSpeed;
+			if (this.offset > this.stepSize/2) this.offset = this.stepSize/2;
+
+			// update the dino
+			this.dino.updateBody((this.offset - prevOffset)/4);
+
+			// update other legs
+			for (var i = 0; i < this.dino.legs.length; ++i) {
+				var leg = this.dino.legs[i];
+				if (leg.idx != this.idx) leg.offset += -(this.offset - prevOffset)/3;
+			}
+
+			// when we reach the ending, we are done with this animation
+			if (this.getLegOffset() >= this.stepSize/2) {
+				Logger.log('done moving');
+				this.moving = false;
+				if (Math.abs(this.initialOffset - this.offset) > 0.0001) {
+					this.initialOffset = this.offset;
+				}
+			}
 		},
 
 		moveBackward: function() {
 
-			// make sure this is legal leg movement
-			var rootLoc = this.dino.getLegRootLoc(this.attachLoc);
-			var legLength = this.floorLoc.add(new Vector2(this.moveSpeed, 0)).subtract(rootLoc).length();
-			if (legLength > this.maxLegLength) return;
+			// not movable - skip
+			if (!this.moving && !this.isMovable()) return;
 
-			// make sure it is also legal for all other legs
-			var ok = this.dino.updateBody(this.moveSpeed/4);
-			if (!ok) return;
+			// we can move, but another leg is moving - skip
+			if (!this.moving && this.dino.hasMovingLeg()) return;
+			
+			// we are definitely moving now
+			this.moving = true;
 
-			// update position
-			this.floorLoc.x += this.moveSpeed;
+			// we update our position in the right direction
+			var prevOffset = this.offset;
+			this.offset -=this.moveSpeed;
+			if (this.offset < -this.stepSize/2) this.offset = -this.stepSize/2;
+
+			// update the dino
+			this.dino.updateBody((this.offset - prevOffset)/4);
+
+			// update other legs
+			for (var i = 0; i < this.dino.legs.length; ++i) {
+				var leg = this.dino.legs[i];
+				if (leg.idx != this.idx) leg.offset += -(this.offset - prevOffset)/3;
+			}
+
+			// when we reach the ending, we are done with this animation
+			if (this.getLegOffset() <= -this.stepSize/2) {
+				this.moving = false;
+				if (Math.abs(this.initialOffset - this.offset) > 0.0001) {
+					this.initialOffset = this.offset;
+				}
+			}
 		},
 
 		draw: function(ctx) {
 			var rootLoc = this.dino.getLegRootLoc(this.attachLoc);
+			var floorLoc = this.getFloorLoc();
 			ctx.save();
-			ctx.fillStyle = this.color;
+			if (!this.trying) ctx.fillStyle = this.color;
+			else ctx.fillStyle = "#FF0000";
 			ctx.beginPath();
 			ctx.moveTo(rootLoc.x - 5, rootLoc.y);
 			ctx.lineTo(rootLoc.x + 5, rootLoc.y);
-			ctx.lineTo(this.floorLoc.x + 5, this.floorLoc.y);
-			ctx.lineTo(this.floorLoc.x  - 5, this.floorLoc.y);
+			ctx.lineTo(floorLoc.x + 5, floorLoc.y);
+			ctx.lineTo(floorLoc.x  - 5, floorLoc.y);
 			ctx.lineTo(rootLoc.x - 5, rootLoc.y);
 			ctx.fill();
 			ctx.restore();
-		},
-
-		getState: function() {
-
-		},
-
-		getGroundLoc: function() {
-			return this.attachLoc.add(new Vector2(this.offset, this.legHeight));
-		},
-
-		getPose: function() {
-			return this.pose;
-		},
-
-		getDepth: function() {
-			return this.depth;
-		},
-
-		getAttachLoc: function() {
-			return this.attachLoc;
-		},
-
-		isValidMovement: function(newRootLoc) {
-			return newRootLoc.subtract(this.floorLoc).length() < this.maxLegLength;
 		}
 	});
 
