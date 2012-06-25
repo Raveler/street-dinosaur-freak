@@ -18,7 +18,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		this.canvas.height = this.height;
 
 		// Load images
-		var imagesFileNames=["ground", "buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingTop1", "buildingTop2", "dinoAnimLegSS", "explosionSS", "BG2"];
+		var imagesFileNames=["ground", "buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingTop1", "buildingTop2", "dinoAnimLegSS", "explosionSS", "BG2", "dino/body", "dino/headClosed", "dino/neckPart", "dino/headOpen"];
 		this.loadImages(imagesFileNames);
 
 		// Load json data
