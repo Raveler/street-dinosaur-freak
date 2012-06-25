@@ -3,7 +3,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller"], fu
 	var Dino = Compose(Controller, function() {
 
 		// loc
-		this.loc = new Vector2(400, 775);
+		this.loc = new Vector2(400, 575);
 
 		// body size
 		this.bodySize = new Vector2(200, 50);
