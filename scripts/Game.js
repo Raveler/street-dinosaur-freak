@@ -102,7 +102,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			//ctx.fillRect(0, 0, this.width, this.height);
 
 			this.update_karel();
-			//this.update_dave();
+			/*ctx.save();
+			this.update_dave();
+			ctx.restore();*/
 		},
 
 		isKeyDown: function(c) {
@@ -111,9 +113,10 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 		update_karel: function() {
 
-
 			var ctx = this.canvas.getContext('2d');
 			ctx.save();
+			ctx.fillStyle = "#DDDDDD";
+			ctx.fillRect(0, 0, this.width, this.height);
 			//Logger.log(this.keys);
 			// update the different chars
 			if (this.isKeyDown('A')) this.dino.issueCommand('moveLeg', 0, false);
@@ -129,7 +132,6 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			if (this.keys['key39']) this.dino.issueCommand('moveHead', new Vector2(1, 0));
 			if (this.keys['key40']) this.dino.issueCommand('moveHead', new Vector2(0, 1));
 			
-
 			// draw the dino
 			this.dino.update();
 			this.dino.draw(ctx);

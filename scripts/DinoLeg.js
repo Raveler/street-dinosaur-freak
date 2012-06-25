@@ -29,7 +29,7 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 		if (initialOffset == 2) this.initialOffset = this.stepSize/2;
 
 		//this.initialOffset = this.stepSize / 3 * (initialOffset+2) - this.stepSize/2;
-		Logger.log(this.initialOffset);
+		//Logger.log(this.initialOffset);
 		// current offset
 		this.offset = this.initialOffset;
 
@@ -89,7 +89,7 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 
 			// when we reach the ending, we are done with this animation
 			if (this.getLegOffset() >= this.stepSize/2) {
-				Logger.log('done moving');
+				//Logger.log('done moving');
 				this.moving = false;
 				if (Math.abs(this.initialOffset - this.offset) > 0.0001) {
 					this.initialOffset = this.offset;

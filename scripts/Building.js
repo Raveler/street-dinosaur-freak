@@ -56,10 +56,10 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], fu
 			}
 		},
 
-		checkCollision: function(worldPosition, point) { // TODO only world coor
+		checkCollision: function(cameraPosition, point) { // TODO only world coor
 			if (this.destroyed) return;
 
-			if ((point.x >= (this.position - worldPosition)) && (point.x <= ((this.position + this.buildBlockWidth) - worldPosition))
+			if ((point.x >= (this.position - cameraPosition)) && (point.x <= ((this.position + this.buildBlockWidth) - cameraPosition))
 				&& (point.y > (this.game.height - ((this.buildingBlocks.length +  2) * this.buildBlockHeight)))) {
 				return true;
 			}
@@ -67,7 +67,7 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], fu
 			return false;
 		},
 
-		handleDamage: function(damage, worldPosition, point) { // TODO only world coor // TODO remove worldPosition
+		handleDamage: function(damage, cameraPosition, point) { // TODO only world coor // TODO remove cameraPosition
 			if (this.destroyed) return;
 
 			var animation = new Animation(this.game, "explosion",  1.0, point);
@@ -79,8 +79,8 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], fu
 
 				for(var i = 0; i < (this.buildingBlocks.length + 1); i++) {
 
-					var minX = this.position - worldPosition;
-					var maxX = this.position + this.buildBlockWidth - worldPosition + 25;
+					var minX = this.position - cameraPosition;
+					var maxX = this.position + this.buildBlockWidth - cameraPosition + 25;
 					var minY = this.game.height - this.game.floorHeight - (i * this.buildBlockHeight + 1) + 20;
 					var maxY = this.game.height - this.game.floorHeight - (i * this.buildBlockHeight) - 20;
 					

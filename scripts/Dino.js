@@ -3,7 +3,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller"], fu
 	var Dino = Compose(Controller, function() {
 
 		// loc
-		this.loc = new Vector2(400, 0);
+		this.loc = new Vector2(400, 775);
 
 		// body size
 		this.bodySize = new Vector2(200, 50);
@@ -57,10 +57,11 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller"], fu
 			ctx.save();
 			ctx.translate(this.loc.x, this.loc.y);
 			
-
 			// draw neck
 			this.neck.draw(ctx);
-
+			ctx.fillStyle = "#FFFFFF";
+			//ctx.fillRect(this.bodyLoc.x, this.bodyLoc.y, this.bodySize.x, this.bodySize.y);
+			ctx.fillRect(0, 0, 300, 150);
 			// draw body
 			ctx.drawImage(this.bodyImg, this.bodyLoc.x, this.bodyLoc.y);
 
