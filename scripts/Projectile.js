@@ -1,4 +1,4 @@
-define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compose, Logger, Background, Random, Vector2) {
+define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle"], function(Compose, Logger, Background, Random, Vector2, Rectangle) {
 
 	var Projectile = Compose(function constructor(game, imageName, point, rotation, scale, velocity, dinoProjectile) {
 		this.game = game;
@@ -22,7 +22,7 @@ define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compos
 
 			if ((this.position.y > this.game.height)
 				|| (this.position.y < (0 - this.height))) {
-				this.game.stopParticle(this);
+				this.game.stopProjectile(this);
 				return;
 			}
 		},
@@ -40,16 +40,21 @@ define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compos
 			ctx.restore();
 		},
 
-		getCollisionShape: function() {
-
+		getCollisionShape: function() { // TODO should be rotated too!!!
+			return new Rectangle(
+				//new Vector2(this.position.x, this.position.y),
+				//new Vector2(this.position.x + this.width, this.position.y + this.height)
+				new Vector2(this.position.x + (this.width / 5), this.position.y),
+				new Vector2(this.position.x + this.width - (this.width / 5), this.position.y + this.height)
+			);
 		},
 
 		getDamage: function() {
-			return 0;
+			return 20;
 		},
 
 		handleDamage: function(damage) {
-
+			this.game.stopProjectile(this);
 		}
 
 	});

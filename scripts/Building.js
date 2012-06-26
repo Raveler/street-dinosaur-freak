@@ -1,13 +1,13 @@
-define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Particle", "Projectile"],
-	function(Compose, Logger, Background, Random, Vector2, Animation, Particle, Projectile) {
+define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Particle", "Projectile", "Rectangle"],
+	function(Compose, Logger, Background, Random, Vector2, Animation, Particle, Projectile, Rectangle) {
 	
 	var Building = Compose(function constructor(game, position) {
 		this.game = game;
 		this.position = position;
 
 		this.maxHeight = 8;
-		this.numTopTypes = 2;
-		this.numBlockTypes = 4;
+		this.numTopTypes = 4;
+		this.numBlockTypes = 6;
 		this.buildBlockHeight = 60;
 		this.buildBlockWidth = 100;
 
@@ -57,22 +57,19 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Pa
 			}
 		},
 
-		checkCollision: function(cameraPosition, point) {
-			if (this.destroyed) return;
-
-			if ((point.x >= (this.position - cameraPosition)) && (point.x <= ((this.position + this.buildBlockWidth) - cameraPosition))
-				&& (point.y > (this.game.height - ((this.buildingBlocks.length +  2) * this.buildBlockHeight)))) {
-				return true;
+		isVisible: function(cameraPosition) {
+			if (((this.position + this.buildBlockWidth) < cameraPosition) || (this.position > (cameraPosition + this.game.width))) {
+				return false;
 			}
 
-			return false;
+			return true;
 		},
 
 		getCollisionShape: function() {
-			//return new Rectangle(
-			//	new Vector2(this.x - this.img.width/2, this.game.floorHeight - this.img.height),
-			//	topRight: new Vector2(this.x + this.img.width/2, this.game.floorHeight)
-			//);
+			return new Rectangle(
+				new Vector2(this.position, this.game.height - ((this.buildingBlocks.length +  2) * this.buildBlockHeight)),
+				new Vector2(this.position + this.buildBlockWidth, this.game.height - this.game.floorHeight)
+			);
 		},
 
 		getDamage: function() {
@@ -85,14 +82,6 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Pa
 			var animation = new Animation(this.game, "explosion",  1.0, Random.getInt(0, 360), point);
 			this.game.addAnimation(animation);
 			this.generateParticle(point);
-
-
-
-			var projectile = new Projectile(this.game, "rocket", point, Random.getInt(0, 10) / 20 - 0.25, 1.00, 3.5);
-			this.game.addProjectile(projectile);
-			var projectile = new Projectile(this.game, "beam", point, Random.getInt(0, 10) / 20 - 0.25, 0.75, 3.5);
-			this.game.addProjectile(projectile);
-
 
 			this.hitPoints -= damage;
 			if (this.hitPoints < 0) {
@@ -137,6 +126,8 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Pa
 					this.generateParticle(explosionPosition5);
 					this.generateParticle(explosionPosition6);
 				}
+
+				this.game.removeBuilding(this);
 			}
 		},
 
