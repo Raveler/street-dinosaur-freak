@@ -61,7 +61,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Par
 			ctx.translate(-this.width/2, -10);
 			ctx.drawImage(this.img, frameOffset, animationOffset, this.width, this.height, 0, 0, this.width, this.height);
 			ctx.restore();
-			
+
 			// next frame
 			--this.frameCounter;
 			if (this.frameCounter == 0) {
@@ -91,16 +91,22 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Par
 			this.game.addAnimation(animation);
 			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
 			this.game.addAnimation(animation);
+			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
+			this.game.addAnimation(animation);
+			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
+			this.game.addAnimation(animation);
+			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
+			this.game.addAnimation(animation);
 			this.game.civilians.splice(this.game.animations.indexOf(this), 1);
 			//this.game.stopActor(this);
 			
-			for (var i = 0; i < 10; ++i) {
+			for (var i = 0; i < 20; ++i) {
 				this.generateParticle(this.getLoc().add(new Vector2(Random.getInt(-10, 10), Random.getInt(-10, 10))));
 			}
 		},
 
 		generateParticle: function(point) {
-			var particleVelocity = new Vector2(Random.getInt(1, 5) - 3.5, Random.getInt(1, 7) - 5);
+			var particleVelocity = new Vector2(Random.getInt(1, 5) - 3.5, Random.getInt(1, 7) - 8);
 			var particle = new Particle(this.game, "human/gore" + Random.getInt(1, 9), point, Random.getInt(0, 360), 0.50, particleVelocity, 0.025);
 			this.game.addParticle(particle);
 		}

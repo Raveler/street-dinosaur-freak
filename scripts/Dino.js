@@ -38,7 +38,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 
 		// bite damage
 		this.biteDamage = 1;
-		this.biteHeal = 1;
+		this.biteHeal = 3;
 		this.normalDamage = 10;
 
 		// handle leg command
