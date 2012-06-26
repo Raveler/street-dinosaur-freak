@@ -105,6 +105,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		};
 
 		this.mouseClick = function(e) {
+			if (this.phase != 0) {
+				this.phase--;
+			}
 			var mousePosX = -1;
 			var mousePosY = -1;
 			if (!e) var e = window.event;
