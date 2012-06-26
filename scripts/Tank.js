@@ -8,7 +8,6 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 		this.image = this.game.images["human/tankSS"];
 
 		this.position = position;
-		Logger.log(this.animation.height);
 		this.position.y = this.game.height - this.game.floorHeight - this.animation.height + 15;
 
 		this.attackMode = false;

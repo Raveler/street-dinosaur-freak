@@ -45,6 +45,8 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		imagesFileNames.push("human/gore7");
 		imagesFileNames.push("human/gore8");
 		imagesFileNames.push("human/gore9");
+		imagesFileNames.push("splashScreenBegin");
+		imagesFileNames.push("splashScreenTutorial");
 		
 		this.loadImages(imagesFileNames);
 
@@ -62,6 +64,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		jsonFileNames.push("debris/bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausage2SS");
 		this.loadJson(jsonFileNames);
+
+		// Launch phase
+		this.phase = 2;
 
 		// Generate the buildings
 		this.minBuildingSpacing = 135;
@@ -98,6 +103,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		// keys
 		this.keys = {};
 		this.keyDown = function(e) {
+			if (this.phase != 0) {
+				this.phase--;
+			}
 			var ch = String.fromCharCode(e.keyCode);
 			this.keys['key' + e.keyCode] = true;
 			if (e.keyCode != 116) e.preventDefault();
@@ -143,12 +151,21 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		},
 
 		update: function() {
-			/*if (this.launched == 0) {
-				return;
-			}*/
-
 			if (!(this.imagesPending == 0) || !(this.jsonPending == 0)) {
 				this.mousePressed = false;
+				return;
+			}
+
+			// Show splashes if needed
+			if (this.phase == 2) {
+				var ctx = this.canvas.getContext('2d');
+				var image = this.images['splashScreenBegin'];
+				ctx.drawImage(image, 0, 0, image.width, image.height);
+				return;
+			} else if (this.phase == 1) {
+				var ctx = this.canvas.getContext('2d');
+				var image = this.images['splashScreenTutorial'];
+				ctx.drawImage(image, 0, 0, image.width, image.height);
 				return;
 			}
 
