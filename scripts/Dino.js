@@ -78,9 +78,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 			}
 
 			// look for a collision
-			Logger.log('Civilians: ' + this.game.civilians.length);
 			for (var i = 0; i < this.game.civilians.length; ++i) {
-				Logger.log('Civilians: ' + this.game.civilians.length);
 				var civ = this.game.civilians[i];
 				this.processCollision(civ, false, true, false);
 			}
