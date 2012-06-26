@@ -1,4 +1,4 @@
-define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle"], function(Compose, Logger, Background, Random, Vector2, Rectangle) {
+define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle", "Animation"], function(Compose, Logger, Background, Random, Vector2, Rectangle, Animation) {
 
 	var Projectile = Compose(function constructor(game, imageName, point, rotation, scale, velocity, dinoProjectile) {
 		this.game = game;
@@ -54,6 +54,10 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle"], fu
 		},
 
 		handleDamage: function(damage) {
+			var animation = new Animation(this.game, "explosion",  1.0, Random.getInt(0, 360),
+				new Vector2(this.position.x + this.width / 2, this.position.y + this.height / 2));
+			this.game.addAnimation(animation);
+
 			this.game.stopProjectile(this);
 		}
 
