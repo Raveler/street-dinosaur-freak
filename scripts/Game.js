@@ -1,5 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Rectangle", "Civilian", "Chopper"],
-	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Rectangle, Civilian, Chopper) {
+define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Rectangle", "Civilian", "Chopper", "Tank"],
+	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Rectangle, Civilian, Chopper, Tank) {
 	
 	var Game = Compose(function constructor() {
 		
@@ -25,6 +25,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		imagesFileNames.push("dino/dinoAnimLegSS");
 		imagesFileNames.push("human/civilianSS");
 		imagesFileNames.push("human/heliSS");
+		imagesFileNames.push("human/tankSS");
 		imagesFileNames.push("human/civilian1SS");
 		imagesFileNames.push("human/civilian2SS");
 		imagesFileNames.push("human/civilian3SS");
@@ -49,10 +50,11 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		jsonFileNames.push("dino/dinoAnimLeg");
 		jsonFileNames.push("human/civilianSS");
 		jsonFileNames.push("human/heliSS");
-		imagesFileNames.push("human/civilian1SS");
-		imagesFileNames.push("human/civilian2SS");
-		imagesFileNames.push("human/civilian3SS");
-		imagesFileNames.push("human/civilian4SS");
+		jsonFileNames.push("human/tankSS");
+		//jsonFileNames.push("human/civilian1SS");
+		//jsonFileNames.push("human/civilian2SS");
+		//jsonFileNames.push("human/civilian3SS");
+		//jsonFileNames.push("human/civilian4SS");
 		jsonFileNames.push("bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausage2SS");
@@ -275,8 +277,15 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				}
 
 				this.buildings[i].draw(ctx, this.worldPosition);
+			}	
+			// Check for collisions with projectiles
+			for(var i = 0; i < this.buildings.length; i++) {
+				if (!this.buildings[i].isVisible(this.worldPosition)) {
+					continue;
+				}
 
-				// Check for collisions with projectiles
+				this.buildings[i].draw(ctx, this.worldPosition);
+
 				var collisionShape = this.buildings[i].getCollisionShape();
 				for(var i2 = 0; i2 < this.projectiles.length; i2++) {
 					if (this.projectiles[i2].dinoProjectile) {
@@ -319,8 +328,6 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				this.actors[m].draw(ctx);
 			}
 			for(var m = 0; m < this.actors.length; m++) {
-				this.actors[m].update();
-
 				// Check for collisions with projectiles
 				var collisionShape = this.actors[m].getCollisionShape();
 				for(var m2 = 0; m2 < this.projectiles.length; m2++) {
@@ -331,7 +338,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 						}
 					}
 				}
-					
+			}
+			for(var m = 0; m < this.actors.length; m++) {
+				this.actors[m].update();					
 			}
 
 			ctx.restore();
@@ -373,7 +382,8 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			//var projectile = new Projectile(this, "beam", this.MousePosition, angle, 0.75, 3.5, true);
 			//this.addProjectile(projectile);
 
-			this.addActor(new Chopper(this, new Vector2(this.MousePosition.x + this.worldPosition, this.MousePosition.y)));
+			//this.addActor(new Chopper(this, new Vector2(this.MousePosition.x + this.worldPosition, this.MousePosition.y)));
+			this.addActor(new Tank(this, new Vector2(this.MousePosition.x + this.worldPosition, this.MousePosition.y)));
 		},
 
 

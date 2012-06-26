@@ -1,6 +1,6 @@
 define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Projectile"], function(Compose, Vector2, Rectangle, Animation, Random, Logger, Projectile) {
 
-	var deleteThreshold = 2000;
+	var deleteThreshold = 1000;
 
 	var Chopper = Compose(function(game, position) {
 		this.position = position;
@@ -32,7 +32,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 				var projectile = new Projectile(this.game, "rocket", this.position, -angle, 1.00, 3.5, false);
 				this.game.addProjectile(projectile);
 
-				this.missileCooldown = 120;
+				this.missileCooldown = 300;
 			} else {
 				if (Math.abs(this.position.x - this.game.dino.getLoc().x) < 350) {
 					this.attackMode = true;

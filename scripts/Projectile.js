@@ -1,7 +1,7 @@
 define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle", "Animation"], function(Compose, Logger, Background, Random, Vector2, Rectangle, Animation) {
 
-	var deleteThreshold = 2000;
-	
+	var deleteThreshold = 1000;
+
 	var Projectile = Compose(function constructor(game, imageName, point, rotation, scale, velocity, dinoProjectile) {
 		this.game = game;
 		this.image = this.game.images[imageName];

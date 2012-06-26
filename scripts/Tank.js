@@ -1,14 +1,18 @@
 define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Projectile"], function(Compose, Vector2, Rectangle, Animation, Random, Logger, Projectile) {
 
+	var deleteThreshold = 1000;
+
 	var Tank = Compose(function(game, position) {
-		this.position = position;
-
 		this.game = game;
-		this.animation = this.game.json["human/heliSS"];
-		this.image = this.game.images["human/heliSS"];
+		this.animation = this.game.json["human/tankSS"];
+		this.image = this.game.images["human/tankSS"];
 
-		this.attackMode = true;
-		//this.speed = 0.5;
+		this.position = position;
+		Logger.log(this.animation.height);
+		this.position.y = this.game.height - this.game.floorHeight - this.animation.height + 15;
+
+		this.attackMode = false;
+		this.speed = -0.5;
 
 		this.frame = 0;
 		this.nFrames = 9;
@@ -25,37 +29,28 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 					return;
 				}
 
-				// launch missle
-				//var target = new Vector2(this.position.x - 10, this.position.y - 10);
 				var target = this.game.dino.getLoc();
 				var angle = Math.atan2(this.position.y - target.y, target.x - this.position.x);
 				var projectile = new Projectile(this.game, "rocket", this.position, -angle, 1.00, 3.5, false);
 				this.game.addProjectile(projectile);
 
-				this.missileCooldown = 120;
+				this.missileCooldown = 300;
+			} else {
+				if (Math.abs(this.position.x - this.game.dino.getLoc().x) < 350) {
+					this.attackMode = true;
+					return;
+				}
+
+				this.position.x += this.speed;
+
+				//delete if far away
+				if ((this.position.y > this.game.height) || (this.position.y < (0 - this.height))
+					|| (this.position.x < (this.game.worldPosition - deleteThreshold))
+					|| (this.position.x > (this.game.worldPosition + deleteThreshold))) {
+					this.game.stopActor(this);
+					return;
+				}
 			}
-
-
-			/*if (!this.panic) this.x -= this.walkSpeed;
-
-			// look for distance from dino
-			if (Math.abs(this.x - this.game.dino.getLoc().x) < 150) this.panic = true;
-
-			// PANIC MODE
-			if (this.panic) {
-				if (this.targetX == null) {
-					this.targetX = Random.getInt(this.x - 150, this.x + 150);
-				}
-				this.direction = (this.targetX < this.x) ? 0 : 1;
-				if (this.direction == 0) {
-					this.x -= this.runSpeed;
-					if (this.x < this.targetX) this.targetX = null;
-				}
-				else {
-					this.x += this.runSpeed;
-					if (this.x > this.targetX) this.targetX = null;
-				}
-			}*/
 		},
 
 		draw: function(ctx) {
@@ -77,7 +72,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 		},
 
 		getCollisionShape: function() {
-			//return new Rectangle(this.getLoc(), new Vector2(this.x + this.img.width/2, this.game.height - this.game.floorHeight));
+			return new Rectangle(this.position, new Vector2(this.position.x + this.animation.width, this.position.y + this.animation.height));
 		},
 
 		getDamage: function() {
@@ -85,15 +80,11 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 		},
 
 		handleDamage: function(damage) {
-			//var animation = new Animation(this.game, "bloodSausageSS",  1.0, this.getLoc());
-			//var animation = new Animation(this.game, "bloodSausageSS", 0.1, Random.getInt(0, 360), this.getLoc());
-			/*var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc().subtract(this.width/2, this.height/2));
+			var animation = new Animation(this.game, "explosion",  1.0, Random.getInt(0, 360),
+				new Vector2(this.position.x + this.animation.width / 2, this.position.y + this.animation.height / 2));
 			this.game.addAnimation(animation);
-			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
-			this.game.addAnimation(animation);
-			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
-			this.game.addAnimation(animation);
-			this.game.civilians.splice(this.game.animations.indexOf(this), 1);*/
+
+			this.game.stopActor(this);
 		}
 	})
 
