@@ -1,4 +1,4 @@
-define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller"], function(Compose, Logger, Vector2, DinoLeg, DinoNeck, Controller) {
+define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Rectangle"], function(Compose, Logger, Vector2, DinoLeg, DinoNeck, Controller, Rectangle) {
 
 	var Dino = Compose(Controller, function() {
 
@@ -68,6 +68,9 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller"], fu
 
 		update: function() {
 
+			// world position
+			this.game.worldPosition = this.loc.x - this.game.width/2;
+
 			// update the neck
 			this.neck.update();
 
@@ -92,7 +95,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller"], fu
 			//ctx.fillRect(this.bodyLoc.x, this.bodyLoc.y, this.bodySize.x, this.bodySize.y);
 			// draw body
 			ctx.drawImage(this.bodyImg, this.bodyLoc.x, this.bodyLoc.y);
-this.neck.draw(ctx);
+			this.neck.draw(ctx);
 			ctx.restore();
 
 			// draw front legs
@@ -122,8 +125,7 @@ this.neck.draw(ctx);
 
 		processCollision: function(obj) {
 			var rect = obj.getCollisionShape();
-			Logger.log(rect);
-
+			//Logger.log(rect);
 			// look for bite collision - this does extra damage
 			if (this.neck.isBiteCollision(rect)) {
 				Logger.log('BITE DMG');
@@ -158,6 +160,11 @@ this.neck.draw(ctx);
 		},
 
 		processClick: function(loc) {
+			if (this.neck.isNormalCollision(new Rectangle(new Vector2(loc.x-1, loc.y-1), new Vector2(loc.x+1, loc.y+1)))) Logger.log('NECK COLLISION at ' + loc.toString());
+		},
+
+		getLoc: function() {
+			return this.loc;
 		}
 
 	});

@@ -159,7 +159,7 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier"], function(Compos
 
 		openMouth: function(open) {
 			if (this.open && !open) {
-				this.biteCountDown = 5;
+				this.biteCountDown = 20;
 			}
 			this.open = open;
 		},

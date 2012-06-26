@@ -1,5 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color"],
-	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color) {
+define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Civilian"],
+	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Civilian) {
 	
 	var Game = Compose(function constructor() {
 		
@@ -25,6 +25,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		imagesFileNames.push("dino/dinoAnimLegSS");
 		imagesFileNames.push("human/civilianSS");
 		imagesFileNames.push("bloodSausageSS");
+		imagesFileNames.push("debris/bloodSausage2SS");
 		this.loadImages(imagesFileNames);
 
 		// Load json data
@@ -32,6 +33,8 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		jsonFileNames.push("dino/dinoAnimLeg");
 		jsonFileNames.push("human/civilianSS");
 		jsonFileNames.push("bloodSausageSS");
+		jsonFileNames.push("debris/bloodSausageSS");
+		jsonFileNames.push("debris/bloodSausage2SS");
 		this.loadJson(jsonFileNames);
 
 		// Generate the buildings
@@ -115,14 +118,14 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 				// spawn random civilians
 				for (var i = 0; i < 10; ++i) {
-					var civ = new Civilian(Random.getInt(0, this.width));
+					var civ = new Civilian(Random.getInt(800, 900));
 					civ.init(this);
 					this.civilians.push(civ);
 				}
 			}
 
+			this.update_dave();
 			this.update_karel();
-			//this.update_dave();
 
 			// Handle mouse events
 			this.handleMouseClick();
@@ -136,8 +139,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 			var ctx = this.canvas.getContext('2d');
 			ctx.save();
-			ctx.fillStyle = "#DDDDDD";
-			ctx.fillRect(0, 0, this.width, this.height);
+			ctx.translate(-this.worldPosition, 0);
 			//Logger.log(this.keys);
 			// update the different chars
 			if (this.isKeyDown('A')) this.dino.issueCommand('moveLeg', 0, false);
@@ -173,9 +175,13 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			ctx.fillRect(54, 54, this.width-108, 42);
 
 			// draw civilians
+			ctx.save();
+			ctx.translate(-this.worldPosition, 0);
 			for (var i = 0; i < this.civilians.length; ++i) {
+				this.civilians[i].update();
 				this.civilians[i].draw(ctx);
 			}
+			ctx.restore();
 		},
 
 
@@ -261,7 +267,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			}
 
 			// TODO tmp
-			this.worldPosition += 1
+			//this.worldPosition += 1
 
 			ctx.restore();
 		},
@@ -270,7 +276,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 		generateBuildings: function(numBuildings) {
 			this.buildings = new Array();
-			var position = 0;
+			var position = 1000;
 			for(var i = 0; i < numBuildings; i++) {
 				position += Random.getInt(this.minBuildingSpacing, this.maxBuildingSpacing);
 				this.buildings[i] = new Building(this, position);

@@ -14,7 +14,7 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 		// some constants
 		this.maxLegLength = 60; // maximum length - defines step size
 		this.legHeight = 50;
-		this.moveSpeed = 1;
+		this.moveSpeed = 1.5;
 
 		// our attach location
 		this.attachLoc = attachLoc;
@@ -154,7 +154,8 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 			var frame = Math.min(this.json.animations[animation].nFrames-1, Math.floor(t * this.json.animations[animation].nFrames));
 			if (frame < 0) frame = 0;
 			//Logger.log("LEG " + this.idx + ", offset " + this.getLegOffset() + ", frame " + frame + ", moving " + this.moving);
-			ctx.drawImage(this.img, frame * this.json.width, animation * this.json.height, this.json.width, this.json.height, rootLoc.x, rootLoc.y, this.json.width, this.json.height);
+			var legHeight = this.idx == 1 || this.idx == 2 ? this.json.height * 1.3 : this.json.height;
+			ctx.drawImage(this.img, frame * this.json.width, animation * this.json.height, this.json.width, this.json.height, rootLoc.x, rootLoc.y - (legHeight - this.json.height), this.json.width, legHeight);
 			ctx.restore();
 		}
 	});
