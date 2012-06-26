@@ -33,6 +33,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		imagesFileNames.push("human/civilian2SS");
 		imagesFileNames.push("human/civilian3SS");
 		imagesFileNames.push("human/civilian4SS");
+		imagesFileNames.push("human/civilian5SS");
 		imagesFileNames.push("bloodSausageSS");
 		imagesFileNames.push("debris/bloodSausage2SS");
 		imagesFileNames.push("dino/beam");
@@ -93,9 +94,12 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		// enemies
 		this.enemies = new Array();
 
+		// game over
+		this.gameOver = false;
+
 		// enemies heuristics
-		this.minEnemies = 10;
-		this.maxEnemies = 30;
+		this.minEnemies = 5;
+		this.maxEnemies = 40;
 		this.maxEnemiesTime = 240; 
 		this.tankChance = 0.7;
 		this.chopperChance = 0.3;
@@ -151,6 +155,12 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		},
 
 		update: function() {
+
+			if (this.gameOver) {
+				this.drawGameOver();
+				return;
+			}
+
 			if (!(this.imagesPending == 0) || !(this.jsonPending == 0)) {
 				this.mousePressed = false;
 				return;
@@ -173,6 +183,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				this.startTime = new Date().getTime();
 				this.dino.init(this);
 				this.firstTime = false;
+				this.mousePressed = false;
 			}
 
 			this.update_dave();
@@ -183,6 +194,54 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 			// Spawn actors
 			this.spawnActors();
+
+			// dead
+			if (this.dino.getHealth() <= 0) {
+				this.gameOver = true;
+				this.gameOverTime = this.getSurviveTime();
+				this.tip = Random.getInt(1, 12);
+			}
+		},
+
+		drawGameOver: function() {
+			var ctx = this.canvas.getContext('2d');
+			ctx.save();
+			ctx.fillStyle = "#000000";
+			ctx.fillRect(0, 0, this.width, this.height);
+			ctx.fillStyle = "#FF0000";
+			ctx.font = "30px Arial";
+			ctx.fillText("You died. Survive time: " + this.gameOverTime + "s", 150, this.height/2);
+			var pick = this.tip;
+			ctx.font = "20px Arial";
+			ctx.fillText("Random tip:", 150, this.height/2 + 50);
+			if (pick < 4) {
+				ctx.fillText("Try to suck less.", 150, this.height/2 + 100);
+			}
+			else if (pick == 5) {
+				ctx.fillText("Civilians will flee destroyed buildings.", 150, this.height/2 + 100);
+			}
+			else if (pick == 6) {
+				ctx.fillText("Moving your dino is tricky but not impossible.", 150, this.height/2 + 100);
+			}
+			else if (pick == 7) {
+				ctx.fillText("Dino's can only lift one foot at a time.", 150, this.height/2 + 100);
+			}
+			else if (pick == 8) {
+				ctx.fillText("Move your dino one leg at a time.", 150, this.height/2 + 100);
+			}
+			else if (pick == 9) {
+				ctx.fillText("Kill choppers with your jaws to take no damage.", 150, this.height/2 + 100);
+			}
+			else if (pick == 10) {
+				ctx.fillText("Eat civilians by snapping your jaws.", 150, this.height/2 + 100);
+			}
+			else if (pick == 11) {
+				ctx.fillText("Kill tanks with your jaws to take no damage.", 150, this.height/2 + 100);
+			}
+			else if (pick == 12) {
+				ctx.fillText("You can headbutt enemies but you will take damage.", 150, this.height/2 + 100);
+			}
+			ctx.restore();
 		},
 
 		isKeyDown: function(c) {
@@ -446,27 +505,24 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			if (maxEnemies > this.maxEnemies) maxEnemies = this.maxEnemies;
 
 			// generate more enemies
-			var nNew = maxEnemies - this.enemies.length;
-			if (nNew > 1) nNew = 1;
+			var nNew = Math.floor(maxEnemies - this.enemies.length);
+			if (nNew > 2) nNew = 2;
+			if (nNew == 0) return;
 			while (--nNew >= 0) {
 				var loc = new Vector2(this.worldPosition + this.width + Random.getInt(0, 150), 0);
 				Logger.log(loc);
 				var pick = Random.getDouble();
 				if (pick <= this.tankChance) {
 					var tank = new Tank(this, loc);
-					//var tank = new Tank(this, new Vector2(this.worldPosition + this.width + 50, 0));
-					Logger.log('add tank at ' + loc.toString());
 					this.enemies.push(tank);
 					this.addActor(tank);
 				}
-				pick += this.tankChance;
-				if (pick <= this.chopperChance) {
+				else {
 					loc.y = Random.getInt(250, 400);
 					var chopper = new Chopper(this, loc);
 					this.enemies.push(chopper);
 					this.addActor(chopper);
 				}
-				pick -= this.chopperChance;
 			}
 		},
 

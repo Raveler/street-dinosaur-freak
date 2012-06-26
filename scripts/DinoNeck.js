@@ -51,6 +51,9 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 		this.laserCharge = 10;
 		this.laserRecharge = 0.02;
 
+		// laser active
+		this.laserDraw = 0;
+
 		// add the number of chains
 		for (var i = 0; i < NChains; ++i) this.chains.push({});
 		this.updateChains();
@@ -59,6 +62,8 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 		init: function(game) {
 			this.headClosedImg = game.getImage('dino/headClosed');
 			this.headOpenImg = game.getImage('dino/headOpen');
+			this.headClosedLaserImg = game.getImage('dino/headClosedLaser');
+			this.headOpenLaserImg = game.getImage('dino/headOpenLaser');
 			this.chainImg = game.getImage('dino/neckPart');
 			this.game = game;
 		},
@@ -121,10 +126,19 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 			ctx.save();
 			ctx.translate(this.headLoc.x, this.headLoc.y);
 			ctx.rotate(headAngle);
-			var img = this.open ? this.headOpenImg : this.headClosedImg;
+			var img = null;
+			if (this.laserDraw == 0) {
+				img = this.open ? this.headOpenImg : this.headClosedImg;
+			}
+			else {
+				img = this.open ? this.headOpenLaserImg : this.headClosedLaserImg;
+			}
 			ctx.translate(-img.width/2, -img.height/2);
 			ctx.drawImage(img, 0, 0);
 			ctx.restore();
+
+			--this.laserDraw;
+			if (this.laserDraw <= 0) this.laserDraw = 0;
 		},
 
 		isBiteCollision: function(rect) {
@@ -215,6 +229,7 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 
 		launchLaser: function(clickPos) {
 			if (this.laserCharge < 1) return;
+			this.laserDraw = 15;
 			this.laserCharge -= 1;
 			clickPos.x += this.game.worldPosition;
 			var headLoc = this.getHeadLoc();

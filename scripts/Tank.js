@@ -30,7 +30,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 
 				var target = this.game.dino.getLoc();
 				var angle = Math.atan2(this.position.y - target.y + 100, target.x - this.position.x);
-				var projectile = new Projectile(this.game, "rocket", this.position, -angle, 1.00, 3.5, false, 1);
+				var projectile = new Projectile(this.game, "rocket", this.position, -angle, 1.00, 3.5, false, 100);
 				this.game.addProjectile(projectile);
 
 				this.missileCooldown = 300;
@@ -82,8 +82,8 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 			var animation = new Animation(this.game, "explosion",  1.0, Random.getInt(0, 360),
 				new Vector2(this.position.x + this.animation.width / 2, this.position.y + this.animation.height / 2));
 			this.game.addAnimation(animation);
-
 			this.game.stopActor(this);
+			this.game.enemies.splice(this.game.enemies.indexOf(this), 1);
 		}
 	})
 

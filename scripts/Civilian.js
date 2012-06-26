@@ -16,7 +16,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Par
 		init: function(game) {
 			this.game = game;
 			this.json = this.game.json["human/civilianSS"];
-			this.img = this.game.images["human/civilian" + Random.getInt(1, 4) + "SS"];
+			this.img = this.game.images["human/civilian" + Random.getInt(1, 5) + "SS"];
 			this.width = this.img.width/5;
 			this.height = this.img.height/3;
 		},
