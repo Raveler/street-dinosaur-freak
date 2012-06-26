@@ -1,4 +1,5 @@
-define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Projectile"], function(Compose, Vector2, Rectangle, Animation, Random, Logger, Projectile) {
+define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Projectile", "Random"],
+	function(Compose, Vector2, Rectangle, Animation, Random, Logger, Projectile, Random) {
 
 	var deleteThreshold = 2000;
 
@@ -6,8 +7,13 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 		this.position = position;
 
 		this.game = game;
-		this.animation = this.game.json["human/heliSS"];
-		this.image = this.game.images["human/heliSS"];
+		if (Random.getInt(0, 1) == 0) {
+			this.animation = this.game.json["human/heliSS"];
+			this.image = this.game.images["human/heliSS"];
+		} else {
+			this.animation = this.game.json["human/heli2SS"];
+			this.image = this.game.images["human/heli2SS"];
+		}
 
 		this.attackMode = false;
 		this.speed = -0.5;
@@ -17,6 +23,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 		this.scale = 0.5;
 		
 		this.missileCooldown = 0;
+		this.stopThreshold = 350 - Random.getInt(0, 400) - 200;
 	},
 	{
 
@@ -34,7 +41,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 
 				this.missileCooldown = 300;
 			} else {
-				if (Math.abs(this.position.x - this.game.dino.getLoc().x) < 350) {
+				if (Math.abs(this.position.x - this.game.dino.getLoc().x) < this.stopThreshold) {
 					this.attackMode = true;
 					return;
 				}

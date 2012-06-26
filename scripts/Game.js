@@ -28,6 +28,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		imagesFileNames.push("dino/headOpenLaser");
 		imagesFileNames.push("human/civilianSS");
 		imagesFileNames.push("human/heliSS");
+		imagesFileNames.push("human/heli2SS");
 		imagesFileNames.push("human/tankSS");
 		imagesFileNames.push("human/civilian1SS");
 		imagesFileNames.push("human/civilian2SS");
@@ -47,6 +48,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		imagesFileNames.push("human/gore9");
 		imagesFileNames.push("splashScreenBegin");
 		imagesFileNames.push("splashScreenTutorial");
+		imagesFileNames.push("explosionSideWaySS");
 		
 		this.loadImages(imagesFileNames);
 
@@ -55,6 +57,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		jsonFileNames.push("dino/dinoAnimLeg");
 		jsonFileNames.push("human/civilianSS");
 		jsonFileNames.push("human/heliSS");
+		jsonFileNames.push("human/heli2SS");
 		jsonFileNames.push("human/tankSS");
 		//jsonFileNames.push("human/civilian1SS");
 		//jsonFileNames.push("human/civilian2SS");
@@ -63,6 +66,8 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		jsonFileNames.push("bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausage2SS");
+		jsonFileNames.push("explosionSideWay");
+
 		this.loadJson(jsonFileNames);
 
 		// Launch phase
