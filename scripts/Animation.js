@@ -6,7 +6,7 @@ define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compos
 		this.game = game;
 		this.animation = this.game.json[animation];
 		// Shift so point is center of animation
-		this.position = new Vector2(point.x - (this.animation.width / 2), point.y - (this.animation.height / 2));
+		this.position = new Vector2(point.x, point.y);// dave gaat dit moeten fixen voor de muis
 		this.scale = scale;
 		this.rotation = rotation;
 
@@ -23,8 +23,8 @@ define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compos
 			 // Translate to midpoint before rotating
 			ctx.translate(this.position.x + (this.animation.width / 2), this.position.y + (this.animation.height / 2));
 			ctx.rotate(this.rotation);
-			ctx.translate(-(this.animation.width / 2), -(this.animation.height / 2));
 			ctx.scale(this.scale, this.scale);
+			ctx.translate(-(this.animation.width * this.scale / 2), -(this.animation.height * this.scale / 2));
 			ctx.drawImage(this.game.images[this.animation.fileName],
 				this.animation.width * this.frame, 0, this.animation.width, this.animation.height,
 				0, 0, this.animation.width, this.animation.height);
