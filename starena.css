@@ -59,3 +59,18 @@ p {
 	width: 600px;
 	height: 300px;
 }
+
+.canvas-game {
+	position: absolute;
+	z-index: 0;
+}
+
+.canvas-dino {
+	position: absolute;
+	z-index: 1;
+}
+
+.canvas-health {
+	position: absolute;
+	z-index: 2;
+}

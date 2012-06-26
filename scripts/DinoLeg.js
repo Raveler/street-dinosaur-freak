@@ -38,11 +38,12 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 	},
 	{
 		init: function(game) {
-
+			this.json = game.json["dino/dinoAnimLeg"];
+			this.img = game.images[this.json.fileName];
 		},
 		
 		getFloorLoc: function() {
-			var legRootLoc = this.getLegRootLoc();
+			var legRootLoc = this.getRootLoc();
 			return new Vector2(legRootLoc.x + this.offset, legRootLoc.y + this.legHeight);
 		},
 
@@ -50,8 +51,8 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 			return this.offset;
 		},
 
-		getLegRootLoc: function() {
-			return this.dino.getLegRootLoc(this.attachLoc);
+		getRootLoc: function() {
+			return this.dino.getRootLoc(this.attachLoc);
 		},
 
 		isMovable: function() {
@@ -94,6 +95,7 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 				if (Math.abs(this.initialOffset - this.offset) > 0.0001) {
 					this.initialOffset = this.offset;
 				}
+				this.offset = this.stepSize/2;
 			}
 		},
 
@@ -128,14 +130,15 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 				if (Math.abs(this.initialOffset - this.offset) > 0.0001) {
 					this.initialOffset = this.offset;
 				}
+				this.offset = -this.stepSize/2;
 			}
 		},
 
 		draw: function(ctx) {
-			var rootLoc = this.dino.getLegRootLoc(this.attachLoc);
+			var rootLoc = this.dino.getRootLoc(this.attachLoc);
 			var floorLoc = this.getFloorLoc();
 			ctx.save();
-			if (!this.trying) ctx.fillStyle = this.color;
+			/*if (!this.trying) ctx.fillStyle = this.color;
 			else ctx.fillStyle = "#FF0000";
 			ctx.beginPath();
 			ctx.moveTo(rootLoc.x - 5, rootLoc.y);
@@ -143,7 +146,15 @@ define(["Compose", "Logger", "Vector2", "Controller"], function(Compose, Logger,
 			ctx.lineTo(floorLoc.x + 5, floorLoc.y);
 			ctx.lineTo(floorLoc.x  - 5, floorLoc.y);
 			ctx.lineTo(rootLoc.x - 5, rootLoc.y);
-			ctx.fill();
+			ctx.fill();*/
+
+			// compute our relative position in the animation
+			var t = (this.getLegOffset() + this.stepSize/2) / this.stepSize;
+			var animation = this.moving ? 0 : 1;
+			var frame = Math.min(this.json.animations[animation].nFrames-1, Math.floor(t * this.json.animations[animation].nFrames));
+			if (frame < 0) frame = 0;
+			//Logger.log("LEG " + this.idx + ", offset " + this.getLegOffset() + ", frame " + frame + ", moving " + this.moving);
+			ctx.drawImage(this.img, frame * this.json.width, animation * this.json.height, this.json.width, this.json.height, rootLoc.x, rootLoc.y, this.json.width, this.json.height);
 			ctx.restore();
 		}
 	});

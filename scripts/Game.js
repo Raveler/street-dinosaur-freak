@@ -1,4 +1,4 @@
-define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation"], function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation) {
+define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Bezier", "Color", "Civilian"], function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Bezier, Color, Civilian) {
 	
 	var Game = Compose(function constructor() {
 		
@@ -14,15 +14,22 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		
 		// the canvas
 		this.canvas = document.createElement('canvas');
+		this.canvas.style = "canvas-game";
 		this.canvas.width = this.width;
 		this.canvas.height = this.height;
 
 		// Load images
 		var imagesFileNames=["ground", "buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingTop1", "buildingTop2", "dinoAnimLegSS", "explosionSS", "BG2", "dino/body", "dino/headClosed", "dino/neckPart", "dino/headOpen"];
+		imagesFileNames.push("dino/dinoAnimLegSS");
+		imagesFileNames.push("human/civilianSS");
+		imagesFileNames.push("bloodSausageSS");
 		this.loadImages(imagesFileNames);
 
 		// Load json data
 		var jsonFileNames = ["explosion"];
+		jsonFileNames.push("dino/dinoAnimLeg");
+		jsonFileNames.push("human/civilianSS");
+		jsonFileNames.push("bloodSausageSS");
 		this.loadJson(jsonFileNames);
 
 		// Generate the buildings
@@ -37,6 +44,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 		// dino
 		this.dino = new Dino();
+
+		// objects
+		this.civilians = new Array();
 
 		// keys
 		this.keys = {};
@@ -94,6 +104,13 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			if (this.firstTime) {
 				this.dino.init(this);
 				this.firstTime = false;
+
+				// spawn random civilians
+				for (var i = 0; i < 10; ++i) {
+					var civ = new Civilian(Random.getInt(0, this.width));
+					civ.init(this);
+					this.civilians.push(civ);
+				}
 			}
 
 
@@ -105,6 +122,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			/*ctx.save();
 			this.update_dave();
 			ctx.restore();*/
+
+			// Handle mouse events
+			this.handleMouseClick();
 		},
 
 		isKeyDown: function(c) {
@@ -131,12 +151,30 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			if (this.keys['key38']) this.dino.issueCommand('moveHead', new Vector2(0, -1));
 			if (this.keys['key39']) this.dino.issueCommand('moveHead', new Vector2(1, 0));
 			if (this.keys['key40']) this.dino.issueCommand('moveHead', new Vector2(0, 1));
-			
+			if (this.keys['key109']) this.dino.issueCommand('openMouth', true);
+			else if (this.keys['key107']) this.dino.issueCommand('openMouth', false);
 			// draw the dino
 			this.dino.update();
 			this.dino.draw(ctx);
-
 			ctx.restore();
+
+			// get health
+			var health = this.dino.getHealth();
+
+			// draw a health bar in the right color on top of the screen
+			ctx.fillStyle = "#000000";
+			ctx.fillRect(50, 50, this.width-100, 50);
+			var red = new Color(255, 0, 0);
+			var green = new Color(0, 255, 0);
+			var col = new Color();
+			col.interpolate(red, green, health/100);
+			ctx.fillStyle = "rgba(" + col.red + "," + col.green + "," + col.blue + ",1.0)";
+			ctx.fillRect(54, 54, this.width-108, 42);
+
+			// draw civilians
+			for (var i = 0; i < this.civilians.length; ++i) {
+				this.civilians[i].draw(ctx);
+			}
 		},
 
 
@@ -181,9 +219,6 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 			var ctx = this.canvas.getContext('2d');  
 
-			// Handle mouse events
-			this.handleMouseClick();
-
 			// Draw the background
 			ctx.drawImage(this.images["BG2"], - (Math.floor(this.worldPosition / 3) % this.width), 0);
 			ctx.drawImage(this.images["BG2"], - (Math.floor(this.worldPosition / 3) % this.width) + this.width, 0);
@@ -223,6 +258,8 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			if (!this.mousePressed) {
 				return;
 			}
+
+			this.dino.processClick(this.MousePosition);
 
 			this.mousePressed = false;
 

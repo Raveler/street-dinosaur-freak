@@ -40,4 +40,3 @@ game -> this.objects
 => getCollisionShape() : topLeft, bottomRight
 => getDamage()
 => handleDamage()
-
