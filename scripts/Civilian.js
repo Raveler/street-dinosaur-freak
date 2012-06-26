@@ -19,7 +19,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], fun
 			this.img = this.game.images["human/civilianSS"];
 			this.width = this.img.width/5;
 			this.height = this.img.height/3;
-			Logger.log(this.game.json["debris/bloodSausageSS"]);
+			//Logger.log(this.game.json["debris/bloodSausageSS"]);
 		},
 
 		update: function() {

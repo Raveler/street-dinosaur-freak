@@ -1,5 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Rectangle", "Civilian"],
-	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Rectangle, Civilian) {
+define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Rectangle", "Civilian", "Chopper"],
+	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Rectangle, Civilian, Chopper) {
 	
 	var Game = Compose(function constructor() {
 		
@@ -24,6 +24,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				"debri1", "debri2", "debri3", "debri4", "debri5", "debri6", "debri7", "debri8", "rocket", "beam"];
 		imagesFileNames.push("dino/dinoAnimLegSS");
 		imagesFileNames.push("human/civilianSS");
+		imagesFileNames.push("human/heliSS");
 		imagesFileNames.push("bloodSausageSS");
 		imagesFileNames.push("debris/bloodSausage2SS");
 		this.loadImages(imagesFileNames);
@@ -32,6 +33,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		var jsonFileNames = ["explosion"];
 		jsonFileNames.push("dino/dinoAnimLeg");
 		jsonFileNames.push("human/civilianSS");
+		jsonFileNames.push("human/heliSS");
 		jsonFileNames.push("bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausage2SS");
@@ -51,7 +53,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		// Projectiles
 		this.projectiles = new Array();
 		// Actors
-		this.projectiles = new Array();
+		this.actors = new Array();
 
 		// dino
 		this.dino = new Dino();
@@ -107,6 +109,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		},
 
 		update: function() {
+			/*if (this.launched == 0) {
+				return;
+			}*/
 
 			if (!(this.imagesPending == 0) || !(this.jsonPending == 0)) {
 				this.mousePressed = false;
@@ -244,7 +249,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				for(var i2 = 0; i2 < this.projectiles.length; i2++) {
 					if (this.projectiles[i2].dinoProjectile) {
 						if (this.projectiles[i2].getCollisionShape().collidesWith(collisionShape)) {
-							this.buildings[i].handleDamage(this.projectiles[i2].getDamage(), this.MousePosition.add(new Vector2(this.worldPosition, 0)));
+							this.buildings[i].handleDamage(this.projectiles[i2].getDamage(), this.projectiles[i2].position);
 							this.projectiles[i2].handleDamage();
 						}
 					}
@@ -275,6 +280,14 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			}
 			for(var l = 0; l < this.projectiles.length; l++) {
 				this.projectiles[l].update();
+			}
+
+			// Draw actors
+			for(var m = 0; m < this.actors.length; m++) {
+				this.actors[m].draw(ctx);
+			}
+			for(var m = 0; m < this.actors.length; m++) {
+				this.actors[m].update();
 			}
 
 			// TODO tmp
@@ -312,12 +325,14 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 
 			// TODO tmp
-			p2 = new Vector2(0, 300);
-			var angle = Math.atan2(p2.y - this.MousePosition.y, p2.x - this.MousePosition.x)
-			var projectile = new Projectile(this, "rocket", this.MousePosition, angle, 1.00, 3.5, true);
-			this.addProjectile(projectile);
+			//p2 = new Vector2(0, 300);
+			//var angle = Math.atan2(p2.y - this.MousePosition.y, p2.x - this.MousePosition.x)
+			//var projectile = new Projectile(this, "rocket", this.MousePosition, angle, 1.00, 3.5, true);
+			//this.addProjectile(projectile);
 			//var projectile = new Projectile(this, "beam", this.MousePosition, angle, 0.75, 3.5, true);
 			//this.addProjectile(projectile);
+
+			this.addActor(new Chopper(this, this.MousePosition));
 		},
 
 
