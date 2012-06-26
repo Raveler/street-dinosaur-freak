@@ -79,6 +79,16 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Pa
 		handleDamage: function(damage, point) {
 			if (this.destroyed) return;
 
+			if (Math.abs(point.x - this.position) > Math.abs(point.x - (this.position + this.buildBlockWidth))) {
+				var explosionPosition = new Vector2(this.position + this.buildBlockWidth, point.y + 35);
+				var animation = new Animation(this.game, "explosionSideWay", 1.0, 180, explosionPosition);
+				this.game.addAnimation(animation);
+			} else {
+				var explosionPosition = new Vector2(this.position, point.y + 35);
+				var animation = new Animation(this.game, "explosionSideWay", 1.0, 0, explosionPosition);
+				this.game.addAnimation(animation);
+			}
+
 			this.generateParticle(point);
 			this.generateParticle(point);
 			this.generateParticle(point);
