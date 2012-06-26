@@ -2,11 +2,13 @@ define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compos
 	
 	var animationFrameRate = 5;
 
-	var Animations = Compose(function constructor(game, animation, scale, point) {
+	var Animation = Compose(function constructor(game, animation, scale, rotation, point) {
 		this.game = game;
 		this.animation = this.game.json[animation];
-		this.position = new Vector2(this.game.worldPosition + point.x, point.y); //((this.animation.width / 2), (this.animation.height / 2))); TODO
+		// Shift so point is center of animation
+		this.position = new Vector2(point.x - (this.animation.width / 2), point.y - (this.animation.height / 2));
 		this.scale = scale;
+		this.rotation = rotation;
 
 		this.done = false;
 		this.framesPassed = 0;
@@ -14,15 +16,15 @@ define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compos
 	},
 	{
 
-		draw: function(ctx, worldPosition) { // TODO only draw if visible // TODO remove worldposition
+		draw: function(ctx) {
 			if (this.done) return;
 
 			ctx.save();
-			ctx.translate(this.position.x - worldPosition - (this.animation.width / 2),
-				this.position.y - (this.animation.height / 2));
-			// TODO rotate
+			 // Translate to midpoint before rotating
+			ctx.translate(this.position.x + (this.animation.width / 2), this.position.y + (this.animation.height / 2));
+			ctx.rotate(this.rotation);
+			ctx.translate(-(this.animation.width / 2), -(this.animation.height / 2));
 			ctx.scale(this.scale, this.scale);
-			// TODO move back to half size
 			ctx.drawImage(this.game.images[this.animation.fileName],
 				this.animation.width * this.frame, 0, this.animation.width, this.animation.height,
 				0, 0, this.animation.width, this.animation.height);
@@ -39,5 +41,5 @@ define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compos
 
 	});
 	
-	return Animations;
+	return Animation;
 });

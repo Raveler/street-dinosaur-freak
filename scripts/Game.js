@@ -1,4 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation"], function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation) {
+define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile"],
+	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile) {
 	
 	var Game = Compose(function constructor() {
 		
@@ -18,7 +19,8 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		this.canvas.height = this.height;
 
 		// Load images
-		var imagesFileNames=["ground", "buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingTop1", "buildingTop2", "dinoAnimLegSS", "explosionSS", "BG2", "dino/body", "dino/headClosed", "dino/neckPart", "dino/headOpen"];
+		var imagesFileNames=["ground", "buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingTop1", "buildingTop2", "dinoAnimLegSS", "explosionSS", "BG2", "dino/body", "dino/headClosed", "dino/neckPart", "dino/headOpen",
+				"debri1", "debri2", "debri3", "debri4", "debri5", "debri6", "debri7", "debri8", "rocket", "beam"];
 		this.loadImages(imagesFileNames);
 
 		// Load json data
@@ -34,6 +36,12 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 		// Animations
 		this.animations = new Array();
+		// Particles
+		this.particles = new Array();
+		// Projectiles
+		this.projectiles = new Array();
+		// Actors
+		this.projectiles = new Array();
 
 		// dino
 		this.dino = new Dino();
@@ -72,7 +80,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				mousePosX -= this.canvas.offsetLeft;
 				mousePosY -= this.canvas.offsetTop;
 
-				this.MousePosition = new Vector2(mousePosX, mousePosY)
+				this.MousePosition = new Vector2(mousePosX, mousePosY);
 			}
 		};
 		
@@ -97,14 +105,8 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			}
 
 
-			var ctx = this.canvas.getContext('2d');  
-			//ctx.fillStyle = "rgb(135, 206, 250)";
-			//ctx.fillRect(0, 0, this.width, this.height);
-
 			this.update_karel();
-			/*ctx.save();
 			this.update_dave();
-			ctx.restore();*/
 		},
 
 		isKeyDown: function(c) {
@@ -174,20 +176,24 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 
 		update_dave: function() {
+			var ctx = this.canvas.getContext('2d');
+			ctx.save();
+			ctx.translate(-this.worldPosition, 0);
+
 			if (!(this.imagesPending == 0) || !(this.jsonPending == 0)) {
 				this.mousePressed = false;
 				return;
 			}
 
-			var ctx = this.canvas.getContext('2d');  
+			// Spawn actors
+			this.spawnActors();
 
 			// Handle mouse events
 			this.handleMouseClick();
 
 			// Draw the background
-			ctx.drawImage(this.images["BG2"], - (Math.floor(this.worldPosition / 3) % this.width), 0);
-			ctx.drawImage(this.images["BG2"], - (Math.floor(this.worldPosition / 3) % this.width) + this.width, 0);
-			//ctx.drawImage(this.images["BG2"], 0, 0);
+			ctx.drawImage(this.images["BG2"], this.worldPosition - (Math.floor(this.worldPosition / 3) % this.width), 0);
+			ctx.drawImage(this.images["BG2"], this.worldPosition - (Math.floor(this.worldPosition / 3) % this.width) + this.width, 0);
 
 			// Draw buildings
 			for(var i = 0; i < this.buildings.length; i++) {
@@ -195,17 +201,35 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			}
 
 			// Draw the ground
-			ctx.drawImage(this.images["ground"], -(this.worldPosition % this.width), this.height - 50);
-			ctx.drawImage(this.images["ground"], this.width - (this.worldPosition % this.width), this.height - 50);
-			ctx.drawImage(this.images["ground"], (this.width * 2) - (this.worldPosition % this.width), this.height - 50);
+			ctx.drawImage(this.images["ground"], this.worldPosition - (this.worldPosition % this.width), this.height - 50);
+			ctx.drawImage(this.images["ground"], this.worldPosition + this.width - (this.worldPosition % this.width), this.height - 50);
+			ctx.drawImage(this.images["ground"], this.worldPosition + (this.width * 2) - (this.worldPosition % this.width), this.height - 50);
 
 			// Draw animations
 			for(var j = 0; j < this.animations.length; j++) {
-				this.animations[j].draw(ctx, this.worldPosition);
+				this.animations[j].draw(ctx);
+			}
+
+			// Draw particles
+			for(var k = 0; k < this.particles.length; k++) {
+				this.particles[k].draw(ctx);
+			}
+			for(var k = 0; k < this.particles.length; k++) {
+				this.particles[k].update();
+			}
+
+			// Draw projectiles
+			for(var l = 0; l < this.projectiles.length; l++) {
+				this.projectiles[l].draw(ctx);
+			}
+			for(var l = 0; l < this.projectiles.length; l++) {
+				this.projectiles[l].update();
 			}
 
 			// TODO tmp
 			this.worldPosition += 1
+
+			ctx.restore();
 		},
 
 
@@ -228,8 +252,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 			// Detect collision with building
 			for(var i = 0; i < this.buildings.length; i++) {
-				if (this.buildings[i].checkCollision(this.worldPosition, this.MousePosition)) {
-					this.buildings[i].handleDamage(15, this.worldPosition, this.MousePosition);
+				if (this.buildings[i].checkCollision(this.worldPosition, this.MousePosition)) { // TODO use rectangle shape vs sphere check radius 0.01
+					var worldVector = new Vector2(this.worldPosition, 0);
+					this.buildings[i].handleDamage(15, worldVector.add(this.MousePosition));
 				}
 			}
 		},
@@ -243,6 +268,44 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			var idx = this.animations.indexOf(animation);
 			if(idx != -1) {
 				this.animations.splice(idx, 1);
+			}
+		},
+
+		addParticle: function(particle) {
+			this.particles[this.particles.length] = particle;
+		},
+
+		stopParticle: function(particle) {
+			var idx = this.particles.indexOf(particle);
+			if(idx != -1) {
+				this.particles.splice(idx, 1);
+			}
+		},
+
+		addProjectile: function(projectile) {
+			this.projectiles[this.projectiles.length] = projectile;
+		},
+
+		stopProjectile: function(projectile) {
+			var idx = this.projectiles.indexOf(projectile);
+			if(idx != -1) {
+				this.projectiles.splice(idx, 1);
+			}
+		},
+
+		spawnActors: function(actor) {
+			// TODO heuristic generation of actorstuffings
+		},
+
+		// TODO only add if list not above max size
+		addActor: function(actor) {
+			this.actors[this.actors.length] = actor;
+		},
+
+		stopActor: function(actor) {
+			var idx = this.actors.indexOf(actor);
+			if(idx != -1) {
+				this.actors.splice(idx, 1);
 			}
 		},
 		

@@ -1,3 +1,9 @@
+
+
+3. collision functions karel
+
+
+
 AI:
 ---
 game.dino.getLoc()
