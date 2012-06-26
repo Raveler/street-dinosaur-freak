@@ -50,7 +50,7 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle"], fu
 		},
 
 		getDamage: function() {
-			return 20;
+			return 5;
 		},
 
 		handleDamage: function(damage) {

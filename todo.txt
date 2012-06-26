@@ -1,6 +1,8 @@
 TODO:
-- azerty/qwerty
-- civilian
-- laser eyes
-- neck bite
-- zorgen da ge ni verder kunt als ge tegen een gebouw botst
+- azerty/qwerty -> erty dfgh
+- projectiles checken tegen dino
+- laser minder OP maken
+- voorkomen da ge te veel achteruit kunt
+- staart adden
+- bijten op gebouwen
+- projectiles vs choppers/tanks/civilians?

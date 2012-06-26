@@ -24,14 +24,33 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				"debri1", "debri2", "debri3", "debri4", "debri5", "debri6", "debri7", "debri8", "rocket", "beam"];
 		imagesFileNames.push("dino/dinoAnimLegSS");
 		imagesFileNames.push("human/civilianSS");
+		imagesFileNames.push("human/civilian1SS");
+		imagesFileNames.push("human/civilian2SS");
+		imagesFileNames.push("human/civilian3SS");
+		imagesFileNames.push("human/civilian4SS");
 		imagesFileNames.push("bloodSausageSS");
 		imagesFileNames.push("debris/bloodSausage2SS");
+		imagesFileNames.push("dino/beam");
+		imagesFileNames.push("human/gore1");
+		imagesFileNames.push("human/gore2");
+		imagesFileNames.push("human/gore3");
+		imagesFileNames.push("human/gore4");
+		imagesFileNames.push("human/gore5");
+		imagesFileNames.push("human/gore6");
+		imagesFileNames.push("human/gore7");
+		imagesFileNames.push("human/gore8");
+		imagesFileNames.push("human/gore9");
+		
 		this.loadImages(imagesFileNames);
 
 		// Load json data
 		var jsonFileNames = ["explosion"];
 		jsonFileNames.push("dino/dinoAnimLeg");
 		jsonFileNames.push("human/civilianSS");
+		imagesFileNames.push("human/civilian1SS");
+		imagesFileNames.push("human/civilian2SS");
+		imagesFileNames.push("human/civilian3SS");
+		imagesFileNames.push("human/civilian4SS");
 		jsonFileNames.push("bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausage2SS");
@@ -114,11 +133,12 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			}
 
 			if (this.firstTime) {
+				this.startTime = new Date().getTime();
 				this.dino.init(this);
 				this.firstTime = false;
 
 				// spawn random civilians
-				for (var i = 0; i < 1; ++i) {
+				for (var i = 0; i < 10; ++i) {
 					var civ = new Civilian(Random.getInt(800, 900));
 					civ.init(this);
 					this.civilians.push(civ);
@@ -138,11 +158,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 		update_karel: function() {
 
-			var ctx = this.canvas.getContext('2d');
-			ctx.save();
-			ctx.translate(-this.worldPosition, 0);
-			//Logger.log(this.keys);
-			// update the different chars
+			// update the different keys
 			if (this.isKeyDown('A')) this.dino.issueCommand('moveLeg', 0, false);
 			else if (this.isKeyDown('Z')) this.dino.issueCommand('moveLeg', 0, true);
 			else if (this.isKeyDown('E')) this.dino.issueCommand('moveLeg', 1, false);
@@ -157,13 +173,30 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			if (this.keys['key40']) this.dino.issueCommand('moveHead', new Vector2(0, 1));
 			if (this.keys['key109']) this.dino.issueCommand('openMouth', true);
 			else if (this.keys['key107']) this.dino.issueCommand('openMouth', false);
+
+			// start
+			var ctx = this.canvas.getContext('2d');
+			ctx.save();
+			ctx.translate(-this.worldPosition, 0);
+
 			// draw the dino
 			this.dino.update();
 			this.dino.draw(ctx);
-			ctx.restore();
 
 			// get health
 			var health = this.dino.getHealth();
+
+			// draw civilians
+			for (var i = 0; i < this.civilians.length; ++i) {
+				this.civilians[i].update();
+				this.civilians[i].draw(ctx);
+			}
+
+			// draw the front legs of the dino
+			this.dino.drawFrontLegs(ctx);
+
+			// done
+			ctx.restore();
 
 			// draw a health bar in the right color on top of the screen
 			ctx.fillStyle = "#000000";
@@ -173,16 +206,15 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			var col = new Color();
 			col.interpolate(red, green, health/100);
 			ctx.fillStyle = "rgba(" + col.red + "," + col.green + "," + col.blue + ",1.0)";
-			ctx.fillRect(54, 54, this.width-108, 42);
+			var width = health / 100 * (this.width-108);
+			ctx.fillRect(54, 54, width, 42);
 
-			// draw civilians
-			ctx.save();
-			ctx.translate(-this.worldPosition, 0);
-			for (var i = 0; i < this.civilians.length; ++i) {
-				this.civilians[i].update();
-				this.civilians[i].draw(ctx);
-			}
-			ctx.restore();
+			// time survived
+			ctx.fillStyle = "#000000";
+			var surviveTime = (new Date().getTime() - this.startTime) / 1000;
+			ctx.font = "30px Arial";
+			ctx.fillText("Time survived: " + surviveTime + "s", 60, 85);
+
 		},
 
 
@@ -287,7 +319,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 		generateBuildings: function(numBuildings) {
 			this.buildings = new Array();
-			var position = 100;
+			var position = 2700;
 			for(var i = 0; i < numBuildings; i++) {
 				position += Random.getInt(this.minBuildingSpacing, this.maxBuildingSpacing);
 				this.buildings[i] = new Building(this, position);
@@ -312,10 +344,10 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 
 			// TODO tmp
-			p2 = new Vector2(0, 300);
+			/*p2 = new Vector2(0, 300);
 			var angle = Math.atan2(p2.y - this.MousePosition.y, p2.x - this.MousePosition.x)
 			var projectile = new Projectile(this, "rocket", this.MousePosition, angle, 1.00, 3.5, true);
-			this.addProjectile(projectile);
+			this.addProjectile(projectile);*/
 			//var projectile = new Projectile(this, "beam", this.MousePosition, angle, 0.75, 3.5, true);
 			//this.addProjectile(projectile);
 		},
