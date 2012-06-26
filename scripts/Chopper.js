@@ -23,7 +23,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 		this.scale = 0.5;
 		
 		this.missileCooldown = 0;
-		this.stopThreshold = 350 - Random.getInt(0, 400) - 200;
+		this.stopThreshold = 600 - Random.getInt(0, 300) - 150;
 	},
 	{
 
