@@ -41,14 +41,6 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 		this.biteHeal = 1;
 		this.normalDamage = 10;
 
-		// prev offset sum
-		/*this.prevOffsetSum = 0;
-		for (var i = 0; i < this.legs.length; ++i) {
-			Logger.log(this.legs[i]);
-			this.prevOffsetSum += this.legs[i].getOffset();
-		}
-		Logger.log(this.prevOffsetSum);*/
-
 		// handle leg command
 		this.legCommand = function(idx, forward) {
 			if (forward) this.legs[idx].moveForward();

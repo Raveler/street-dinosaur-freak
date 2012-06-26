@@ -53,7 +53,6 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Par
 			var frameOffset = this.frame * this.width;
 			//var frameOffset = 0;
 			var loc = this.getLoc();
-			//Logger.log('offsets: ' + animationOffset + ',' + frameOffset);
 
 			// move to the right position
 			ctx.save();

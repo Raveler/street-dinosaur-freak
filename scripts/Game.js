@@ -354,7 +354,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		jsonLoaded: function(fileName, json) {
 			this.jsonPending--;
 			this.json[fileName] = json;
-			Logger.log('json loaded: ' + fileName + ' - ' + json);
+			//Logger.log('json loaded: ' + fileName + ' - ' + json);
 		},
 
 
@@ -518,7 +518,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			if (nNew == 0) return;
 			while (--nNew >= 0) {
 				var loc = new Vector2(this.worldPosition + this.width + Random.getInt(0, 150), 0);
-				Logger.log(loc);
+				//Logger.log(loc);
 				var pick = Random.getDouble();
 				if (pick <= this.tankChance) {
 					var tank = new Tank(this, loc);

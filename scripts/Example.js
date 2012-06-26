@@ -22,7 +22,7 @@ define(["Compose", "Logger"], function(Compose, Logger) {
 		print: function() {
 			
 			// Logger is een static helper class van mij om data naar het scherm te printen, handig voor debugging
-			Logger.log(this);
+			//Logger.log(this);
 			
 			// console.log logt een object naar de browser console - laat u toe om live te volgen wat er mee gebeurt
 			console.log(this);
