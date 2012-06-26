@@ -77,7 +77,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 		},
 
 		getCollisionShape: function() {
-			//return new Rectangle(this.getLoc(), new Vector2(this.x + this.img.width/2, this.game.height - this.game.floorHeight));
+			return new Rectangle(this.position, new Vector2(this.position.x + this.animation.width, this.position.y + this.animation.height));
 		},
 
 		getDamage: function() {
@@ -85,6 +85,12 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 		},
 
 		handleDamage: function(damage) {
+			var animation = new Animation(this.game, "explosion",  1.0, Random.getInt(0, 360),
+				new Vector2(this.position.x + this.animation.width / 2, this.position.y + this.animation.height / 2));
+			this.game.addAnimation(animation);
+
+			this.game.stopActor(this);
+
 			//var animation = new Animation(this.game, "bloodSausageSS",  1.0, this.getLoc());
 			//var animation = new Animation(this.game, "bloodSausageSS", 0.1, Random.getInt(0, 360), this.getLoc());
 			/*var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc().subtract(this.width/2, this.height/2));
