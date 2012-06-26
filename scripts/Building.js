@@ -1,4 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], function(Compose, Logger, Background, Random, Vector2, Animation) {
+define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Particle", "Projectile"],
+	function(Compose, Logger, Background, Random, Vector2, Animation, Particle, Projectile) {
 	
 	var Building = Compose(function constructor(game, position) {
 		this.game = game;
@@ -28,13 +29,13 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], fu
 	},
 	{
 
-		draw: function(ctx, cameraPosition) { // TODO only draw if visible
+		draw: function(ctx, cameraPosition) {
 			if (this.destroyed) return;
 			if (((this.position - cameraPosition) < (-this.buildBlockWidth))
 				|| ((this.position - cameraPosition) > (this.game.width))) return;
 
 			ctx.save();
-			ctx.translate(this.position - cameraPosition, this.game.height - this.game.floorHeight);
+			ctx.translate(this.position, this.game.height - this.game.floorHeight);
 			for(var i = 0; i < this.buildingBlocks.length; i++) {
 				this.drawBlock(ctx, this.game.images[this.buildingBlocks[i]], this.buildingBlocksFlipped[i], 0, - (this.buildBlockHeight * (i + 1)));				
 			}
@@ -52,11 +53,11 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], fu
 				ctx.drawImage(img, width, height);
 				ctx.restore();
 			} else {
-				ctx.drawImage(img, width, height);
+				ctx.drawImage(img, width, height); // TODO fix
 			}
 		},
 
-		checkCollision: function(cameraPosition, point) { // TODO only world coor
+		checkCollision: function(cameraPosition, point) {
 			if (this.destroyed) return;
 
 			if ((point.x >= (this.position - cameraPosition)) && (point.x <= ((this.position + this.buildBlockWidth) - cameraPosition))
@@ -67,11 +68,31 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], fu
 			return false;
 		},
 
-		handleDamage: function(damage, cameraPosition, point) { // TODO only world coor // TODO remove cameraPosition
+		getCollisionShape: function() {
+			//return new Rectangle(
+			//	new Vector2(this.x - this.img.width/2, this.game.floorHeight - this.img.height),
+			//	topRight: new Vector2(this.x + this.img.width/2, this.game.floorHeight)
+			//);
+		},
+
+		getDamage: function() {
+			return 0;
+		},
+
+		handleDamage: function(damage, point) {
 			if (this.destroyed) return;
 
-			var animation = new Animation(this.game, "explosion",  1.0, point);
+			var animation = new Animation(this.game, "explosion",  1.0, Random.getInt(0, 360), point);
 			this.game.addAnimation(animation);
+			this.generateParticle(point);
+
+
+
+			var projectile = new Projectile(this.game, "rocket", point, Random.getInt(0, 10) / 20 - 0.25, 1.00, 3.5);
+			this.game.addProjectile(projectile);
+			var projectile = new Projectile(this.game, "beam", point, Random.getInt(0, 10) / 20 - 0.25, 0.75, 3.5);
+			this.game.addProjectile(projectile);
+
 
 			this.hitPoints -= damage;
 			if (this.hitPoints < 0) {
@@ -79,8 +100,8 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], fu
 
 				for(var i = 0; i < (this.buildingBlocks.length + 1); i++) {
 
-					var minX = this.position - cameraPosition;
-					var maxX = this.position + this.buildBlockWidth - cameraPosition + 25;
+					var minX = this.position;
+					var maxX = this.position + this.buildBlockWidth + 25;
 					var minY = this.game.height - this.game.floorHeight - (i * this.buildBlockHeight + 1) + 20;
 					var maxY = this.game.height - this.game.floorHeight - (i * this.buildBlockHeight) - 20;
 					
@@ -90,20 +111,39 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation"], fu
 					explosionPosition4 = new Vector2(Random.getInt(minX, maxX), Random.getInt(minY, maxY));
 					explosionPosition5 = new Vector2(Random.getInt(minX, maxX), Random.getInt(minY, maxY));
 					explosionPosition6 = new Vector2(Random.getInt(minX, maxX), Random.getInt(minY, maxY));
-					var animation1 = new Animation(this.game, "explosion", 0.8, explosionPosition1);
-					var animation2 = new Animation(this.game, "explosion", 0.6, explosionPosition2);
-					var animation3 = new Animation(this.game, "explosion", 0.4, explosionPosition3);
-					var animation4 = new Animation(this.game, "explosion", 0.3, explosionPosition4);
-					var animation5 = new Animation(this.game, "explosion", 0.2, explosionPosition5);
-					var animation6 = new Animation(this.game, "explosion", 0.1, explosionPosition6);
+					var animation1 = new Animation(this.game, "explosion", 0.8, Random.getInt(0, 360), explosionPosition1);
+					var animation2 = new Animation(this.game, "explosion", 0.6, Random.getInt(0, 360), explosionPosition2);
+					var animation3 = new Animation(this.game, "explosion", 0.4, Random.getInt(0, 360), explosionPosition3);
+					var animation4 = new Animation(this.game, "explosion", 0.3, Random.getInt(0, 360), explosionPosition4);
+					var animation5 = new Animation(this.game, "explosion", 0.2, Random.getInt(0, 360), explosionPosition5);
+					var animation6 = new Animation(this.game, "explosion", 0.1, Random.getInt(0, 360), explosionPosition6);
 					this.game.addAnimation(animation1);
 					this.game.addAnimation(animation2);
 					this.game.addAnimation(animation3);
 					this.game.addAnimation(animation4);
 					this.game.addAnimation(animation5);
 					this.game.addAnimation(animation6);
+
+					this.generateParticle(explosionPosition1);
+					this.generateParticle(explosionPosition2);
+					this.generateParticle(explosionPosition3);
+					this.generateParticle(explosionPosition4);
+					this.generateParticle(explosionPosition5);
+					this.generateParticle(explosionPosition6);
+					this.generateParticle(explosionPosition1);
+					this.generateParticle(explosionPosition2);
+					this.generateParticle(explosionPosition3);
+					this.generateParticle(explosionPosition4);
+					this.generateParticle(explosionPosition5);
+					this.generateParticle(explosionPosition6);
 				}
 			}
+		},
+
+		generateParticle: function(point) {
+			var particleVelocity = new Vector2(Random.getInt(1, 5) - 3.5, Random.getInt(1, 7) - 5);
+			var particle = new Particle(this.game, ["debri" + Random.getInt(1, 8)], point, Random.getInt(0, 360), 0.50, particleVelocity, 0.025);
+			this.game.addParticle(particle);
 		}
 	});
 	
