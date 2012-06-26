@@ -1,5 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Civilian"],
-	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Civilian) {
+define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Rectangle", "Civilian"],
+	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Rectangle, Civilian) {
 	
 	var Game = Compose(function constructor() {
 		
@@ -20,7 +20,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		this.canvas.height = this.height;
 
 		// Load images
-		var imagesFileNames=["ground", "buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingTop1", "buildingTop2", "dinoAnimLegSS", "explosionSS", "BG2", "dino/body", "dino/headClosed", "dino/neckPart", "dino/headOpen",
+		var imagesFileNames=["ground", "buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingBlock5", "buildingBlock6", "buildingTop1", "buildingTop2", "buildingTop3", "buildingTop4", "dinoAnimLegSS", "explosionSS", "BG2", "dino/body", "dino/headClosed", "dino/neckPart", "dino/headOpen",
 				"debri1", "debri2", "debri3", "debri4", "debri5", "debri6", "debri7", "debri8", "rocket", "beam"];
 		imagesFileNames.push("dino/dinoAnimLegSS");
 		imagesFileNames.push("human/civilianSS");
@@ -40,7 +40,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		// Generate the buildings
 		this.minBuildingSpacing = 135;
 		this.maxBuildingSpacing = 220;
-		this.generateBuildings(250);
+		this.generateBuildings(100);
 
 		this.worldPosition = 0;
 
@@ -109,6 +109,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		update: function() {
 
 			if (!(this.imagesPending == 0) || !(this.jsonPending == 0)) {
+				this.mousePressed = false;
 				return;
 			}
 
@@ -223,11 +224,6 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			ctx.save();
 			ctx.translate(-this.worldPosition, 0);
 
-			/*if (!(this.imagesPending == 0) || !(this.jsonPending == 0)) {
-				this.mousePressed = false;
-				return;
-			}*/
-
 			// Spawn actors
 			this.spawnActors();
 
@@ -237,7 +233,22 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 			// Draw buildings
 			for(var i = 0; i < this.buildings.length; i++) {
+				if (!this.buildings[i].isVisible(this.worldPosition)) {
+					continue;
+				}
+
 				this.buildings[i].draw(ctx, this.worldPosition);
+
+				// Check for collisions with projectiles
+				var collisionShape = this.buildings[i].getCollisionShape();
+				for(var i2 = 0; i2 < this.projectiles.length; i2++) {
+					if (this.projectiles[i2].dinoProjectile) {
+						if (this.projectiles[i2].getCollisionShape().collidesWith(collisionShape)) {
+							this.buildings[i].handleDamage(this.projectiles[i2].getDamage(), this.MousePosition.add(new Vector2(this.worldPosition, 0)));
+							this.projectiles[i2].handleDamage();
+						}
+					}
+				}
 			}
 
 			// Draw the ground
@@ -276,10 +287,17 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 		generateBuildings: function(numBuildings) {
 			this.buildings = new Array();
-			var position = 1000;
+			var position = 100;
 			for(var i = 0; i < numBuildings; i++) {
 				position += Random.getInt(this.minBuildingSpacing, this.maxBuildingSpacing);
 				this.buildings[i] = new Building(this, position);
+			}
+		},
+
+		removeBuilding: function(building) {
+			var idx = this.buildings.indexOf(building);
+			if(idx != -1) {
+				this.buildings.splice(idx, 1);
 			}
 		},
 
@@ -292,13 +310,14 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 			this.mousePressed = false;
 
-			// Detect collision with building
-			for(var i = 0; i < this.buildings.length; i++) {
-				if (this.buildings[i].checkCollision(this.worldPosition, this.MousePosition)) { // TODO use rectangle shape vs sphere check radius 0.01
-					var worldVector = new Vector2(this.worldPosition, 0);
-					this.buildings[i].handleDamage(15, worldVector.add(this.MousePosition));
-				}
-			}
+
+			// TODO tmp
+			p2 = new Vector2(0, 300);
+			var angle = Math.atan2(p2.y - this.MousePosition.y, p2.x - this.MousePosition.x)
+			var projectile = new Projectile(this, "rocket", this.MousePosition, angle, 1.00, 3.5, true);
+			this.addProjectile(projectile);
+			//var projectile = new Projectile(this, "beam", this.MousePosition, angle, 0.75, 3.5, true);
+			//this.addProjectile(projectile);
 		},
 
 
