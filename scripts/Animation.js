@@ -5,7 +5,6 @@ define(["Compose", "Logger", "Background", "Random", "Vector2"], function(Compos
 	var Animation = Compose(function constructor(game, animation, scale, rotation, point) {
 		this.game = game;
 		this.animation = this.game.json[animation];
-		//Logger.log(this.game.images[this.animation.fileName]);
 		// Shift so point is center of animation
 		this.position = new Vector2(point.x - (this.animation.width / 2), point.y - (this.animation.height / 2));
 		this.scale = scale;

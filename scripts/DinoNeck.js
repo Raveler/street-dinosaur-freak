@@ -1,4 +1,4 @@
-define(["Compose", "Logger", "Vector2", "Controller", "Bezier"], function(Compose, Logger, Vector2, Controller, Bezier) {
+define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], function(Compose, Logger, Vector2, Controller, Bezier, Projectile) {
 
 	// head move speed
 	var HeadMoveSpeed = 2;
@@ -62,19 +62,19 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier"], function(Compos
 			return NChains * MaxChainAngle/2;
 		},
 
-		isValidHeadLoc: function(headLoc) {
+		isValidHeadLoc: function(headLoc, originalLoc) {
 
 			// put in constraints
-			if (headLoc.y > MaxNeckLower) return false;
-			if (headLoc.x < MaxNeckLeft) return false;
+			if (headLoc.y > MaxNeckLower) headLoc.y = MaxNeckLower;
+			if (headLoc.x < MaxNeckLeft) headLoc.x = MaxNeckLeft;
 
 			// neck length
 			var neckLength = headLoc.subtract(this.attachLoc).length();
 			//Logger.log('Neck length: ' + neckLength);
-			if (neckLength < MinNeckLength || neckLength > MaxNeckLength) return false;
+			if (neckLength < MinNeckLength || neckLength > MaxNeckLength) headLoc = originalLoc;
 
 			// all ok
-			return true;
+			return headLoc;
 		},
 
 		update: function() {
@@ -142,13 +142,17 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier"], function(Compos
 			return Math.atan2(this.headLoc.y - this.attachLoc.y, this.headLoc.x - this.attachLoc.x);
 		},
 
+		getHeadLoc: function() {
+			return this.dino.getRootLoc(this.headLoc);
+		},
+
 		move: function(direction) {
 
 			// move head
 			var newLoc = this.headLoc.add(new Vector2(direction.x * HeadMoveSpeed, direction.y * HeadMoveSpeed));
 
 			// verify new loc
-			if (!this.isValidHeadLoc(newLoc)) return;
+			newLoc = this.isValidHeadLoc(newLoc, this.headLoc);
 
 			// update head loc
 			this.headLoc = newLoc;
@@ -196,6 +200,14 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier"], function(Compos
 				this.chains[i].scale = scale;
 				scale *= ChainSizeReduction;
 			}
+		},
+
+		launchLaser: function(clickPos) {
+			clickPos.x += this.game.worldPosition;
+			var headLoc = this.getHeadLoc();
+			var angle = Math.atan2(clickPos.y - headLoc.y, clickPos.x - headLoc.x);
+			var projectile = new Projectile(this.game, "dino/beam", headLoc, angle, 1.00, 3.5, true);
+			this.game.addProjectile(projectile);
 		}
 	});
 

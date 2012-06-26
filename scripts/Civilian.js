@@ -1,10 +1,10 @@
-define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], function(Compose, Vector2, Rectangle, Animation, Random, Logger) {
+define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Particle"], function(Compose, Vector2, Rectangle, Animation, Random, Logger, Particle) {
 
 	var Civilian = Compose(function(x) {
 		this.x = x;
 		this.panic = false;
 		this.walkSpeed = 0.5;
-		this.runSpeed = 2;
+		this.runSpeed = 1.5;
 		this.direction = 0; // 0 = left, 1 = right
 		this.frame = 0;
 		this.frameCounter = 6;
@@ -16,10 +16,9 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], fun
 		init: function(game) {
 			this.game = game;
 			this.json = this.game.json["human/civilianSS"];
-			this.img = this.game.images["human/civilianSS"];
+			this.img = this.game.images["human/civilian" + Random.getInt(1, 4) + "SS"];
 			this.width = this.img.width/5;
 			this.height = this.img.height/3;
-			//Logger.log(this.game.json["debris/bloodSausageSS"]);
 		},
 
 		update: function() {
@@ -28,7 +27,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], fun
 			if (!this.panic) this.x -= this.walkSpeed;
 
 			// look for distance from dino
-			if (Math.abs(this.x - this.game.dino.getLoc().x) < 150) this.panic = true;
+			if (Math.abs(this.x - this.game.dino.getLoc().x) < 300) this.panic = true;
 
 			// PANIC MODE
 			if (this.panic) {
@@ -77,7 +76,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], fun
 		},
 
 		getDamage: function() {
-			return 0;
+			return 1;
 		},
 
 		getLoc: function() {
@@ -94,6 +93,16 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], fun
 			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
 			this.game.addAnimation(animation);
 			this.game.civilians.splice(this.game.animations.indexOf(this), 1);
+			
+			for (var i = 0; i < 10; ++i) {
+				this.generateParticle(this.getLoc().add(new Vector2(Random.getInt(-10, 10), Random.getInt(-10, 10))));
+			}
+		},
+
+		generateParticle: function(point) {
+			var particleVelocity = new Vector2(Random.getInt(1, 5) - 3.5, Random.getInt(1, 7) - 5);
+			var particle = new Particle(this.game, "human/gore" + Random.getInt(1, 9), point, Random.getInt(0, 360), 0.50, particleVelocity, 0.025);
+			this.game.addParticle(particle);
 		}
 	})
 

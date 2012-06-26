@@ -79,8 +79,8 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Pa
 		handleDamage: function(damage, point) {
 			if (this.destroyed) return;
 
-			var animation = new Animation(this.game, "explosion",  1.0, Random.getInt(0, 360), point);
-			this.game.addAnimation(animation);
+			this.generateParticle(point);
+			this.generateParticle(point);
 			this.generateParticle(point);
 
 			this.hitPoints -= damage;
