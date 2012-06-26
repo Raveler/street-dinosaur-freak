@@ -160,7 +160,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 		},
 
 		processClick: function(loc) {
-			if (this.neck.isNormalCollision(new Rectangle(new Vector2(loc.x-1, loc.y-1), new Vector2(loc.x+1, loc.y+1)))) Logger.log('NECK COLLISION at ' + loc.toString());
+			//if (this.neck.isNormalCollision(new Rectangle(new Vector2(loc.x-1, loc.y-1), new Vector2(loc.x+1, loc.y+1)))) Logger.log('NECK COLLISION at ' + loc.toString());
 		},
 
 		getLoc: function() {

@@ -117,7 +117,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				this.firstTime = false;
 
 				// spawn random civilians
-				for (var i = 0; i < 10; ++i) {
+				for (var i = 0; i < 1; ++i) {
 					var civ = new Civilian(Random.getInt(800, 900));
 					civ.init(this);
 					this.civilians.push(civ);

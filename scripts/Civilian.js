@@ -4,7 +4,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], fun
 		this.x = x;
 		this.panic = false;
 		this.walkSpeed = 0.5;
-		this.runSpeed = 2;
+		this.runSpeed = 1.5;
 		this.direction = 0; // 0 = left, 1 = right
 		this.frame = 0;
 		this.frameCounter = 6;
@@ -28,7 +28,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], fun
 			if (!this.panic) this.x -= this.walkSpeed;
 
 			// look for distance from dino
-			if (Math.abs(this.x - this.game.dino.getLoc().x) < 150) this.panic = true;
+			if (Math.abs(this.x - this.game.dino.getLoc().x) < 300) this.panic = true;
 
 			// PANIC MODE
 			if (this.panic) {
@@ -94,6 +94,25 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger"], fun
 			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
 			this.game.addAnimation(animation);
 			this.game.civilians.splice(this.game.animations.indexOf(this), 1);
+			/*
+			this.generateParticle(explosionPosition1);
+			this.generateParticle(explosionPosition2);
+			this.generateParticle(explosionPosition3);
+			this.generateParticle(explosionPosition4);
+			this.generateParticle(explosionPosition5);
+			this.generateParticle(explosionPosition6);
+			this.generateParticle(explosionPosition1);
+			this.generateParticle(explosionPosition2);
+			this.generateParticle(explosionPosition3);
+			this.generateParticle(explosionPosition4);
+			this.generateParticle(explosionPosition5);
+			this.generateParticle(explosionPosition6);*/
+		},
+
+		generateParticle: function(point) {
+			var particleVelocity = new Vector2(Random.getInt(1, 5) - 3.5, Random.getInt(1, 7) - 5);
+			var particle = new Particle(this.game, ["debri" + Random.getInt(1, 8)], point, Random.getInt(0, 360), 0.50, particleVelocity, 0.025);
+			this.game.addParticle(particle);
 		}
 	})
 
