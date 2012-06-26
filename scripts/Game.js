@@ -320,10 +320,19 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			}
 			for(var m = 0; m < this.actors.length; m++) {
 				this.actors[m].update();
-			}
 
-			// TODO tmp
-			//this.worldPosition += 1
+				// Check for collisions with projectiles
+				var collisionShape = this.actors[m].getCollisionShape();
+				for(var m2 = 0; m2 < this.projectiles.length; m2++) {
+					if (this.projectiles[m2].dinoProjectile) {
+						if (this.projectiles[m2].getCollisionShape().collidesWith(collisionShape)) {
+							this.actors[m].handleDamage(this.projectiles[m2].getDamage(), this.projectiles[m2].position);
+							this.projectiles[m2].handleDamage();
+						}
+					}
+				}
+					
+			}
 
 			ctx.restore();
 		},
@@ -364,7 +373,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			//var projectile = new Projectile(this, "beam", this.MousePosition, angle, 0.75, 3.5, true);
 			//this.addProjectile(projectile);
 
-			this.addActor(new Chopper(this, this.MousePosition));
+			this.addActor(new Chopper(this, new Vector2(this.MousePosition.x + this.worldPosition, this.MousePosition.y)));
 		},
 
 
