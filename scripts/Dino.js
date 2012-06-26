@@ -20,6 +20,9 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 		// body loc relative to dino loc
 		this.bodyLoc = new Vector2(-100, -120);
 
+		// tail location
+		this.tailLoc = new Vector2(-210, -60);
+
 		// make the legs
 		this.legs = new Array();
 		this.legs[0] = new DinoLeg(new Vector2(-85, -55), 1, this, 0, '#AAAA00'); // left back
@@ -61,6 +64,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 	{
 		init: function(game) {
 			this.bodyImg = game.getImage('dino/body');
+			this.tailImg = game.getImage('dino/tail');
 			this.neck.init(game);
 			for (var i = 0; i < this.legs.length; ++i) this.legs[i].init(game);
 			this.game = game;
@@ -78,13 +82,25 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 			for (var i = 0; i < this.game.buildings.length; ++i) {
 				var obj = this.game.buildings[i];
 				if (!obj.isVisible(this.game.worldPosition)) continue;
-				this.processCollision(obj, true, false);
+				this.processCollision(obj, true, false, false);
 			}
 
 			// look for a collision
 			for (var i = 0; i < this.game.civilians.length; ++i) {
 				var civ = this.game.civilians[i];
-				this.processCollision(civ, false, true);
+				this.processCollision(civ, false, true, false);
+			}
+
+			// projectiles
+			for (var i = 0; i < this.game.projectiles.length; ++i) {
+				var obj = this.game.projectiles[i];
+				if (!obj.dinoProjectile) this.processCollision(obj, false, false, false);
+			}
+
+			// enemies (tanks, choppers)
+			for (var i = 0; i < this.game.enemies.length; ++i) {
+				var obj = this.game.enemies[i];
+				this.processCollision(obj, false, false, true);
 			}
 		},
 
@@ -102,6 +118,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 			//ctx.fillRect(this.bodyLoc.x, this.bodyLoc.y, this.bodySize.x, this.bodySize.y);
 			// draw body
 			ctx.drawImage(this.bodyImg, this.bodyLoc.x, this.bodyLoc.y);
+			ctx.drawImage(this.tailImg, this.tailLoc.x, this.tailLoc.y);
 			this.neck.draw(ctx);
 			ctx.restore();
 		},
@@ -131,7 +148,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 			this.loc.x += bodySpeed;
 		},
 
-		processCollision: function(obj, blocking, healing) {
+		processCollision: function(obj, blocking, healing, noDamageOnBite) {
 			var rect = obj.getCollisionShape();
 
 			// blocking?
@@ -145,7 +162,7 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 			if (this.neck.isBiteCollision(rect)) {
 				obj.handleDamage(this.biteDamage, this.neck.getHeadLoc());
 				if (healing) this.health += this.biteHeal;
-				else this.health -= obj.getDamage();
+				else if (!noDamageOnBite) this.health -= obj.getDamage();
 			}
 
 			// normal "impact" collision

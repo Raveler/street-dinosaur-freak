@@ -46,6 +46,11 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 		// bite countdown - this is the period in which a collision is registered as a bite instead of a headbutt (open mouth)
 		this.biteCountDown = 0;
 
+		// laser charge
+		this.maxLaserCharge = 10;
+		this.laserCharge = 10;
+		this.laserRecharge = 0.02;
+
 		// add the number of chains
 		for (var i = 0; i < NChains; ++i) this.chains.push({});
 		this.updateChains();
@@ -85,6 +90,12 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 			// look for collisions in all objects
 			//for (var )
 
+			this.laserCharge += this.laserRecharge;
+			if (this.laserCharge > this.maxLaserCharge) this.laserCharge = this.maxLaserCharge;
+		},
+
+		getLaserChargePct: function() {
+			return this.laserCharge / this.maxLaserCharge;
 		},
 
 		draw: function(ctx) {
@@ -203,10 +214,12 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 		},
 
 		launchLaser: function(clickPos) {
+			if (this.laserCharge < 1) return;
+			this.laserCharge -= 1;
 			clickPos.x += this.game.worldPosition;
 			var headLoc = this.getHeadLoc();
 			var angle = Math.atan2(clickPos.y - headLoc.y, clickPos.x - headLoc.x);
-			var projectile = new Projectile(this.game, "dino/beam", headLoc, angle, 1.00, 3.5, true);
+			var projectile = new Projectile(this.game, "dino/beam", headLoc, angle, 1.00, 3.5, true, 5);
 			this.game.addProjectile(projectile);
 		}
 	});

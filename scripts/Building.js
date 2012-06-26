@@ -1,5 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Particle", "Projectile", "Rectangle"],
-	function(Compose, Logger, Background, Random, Vector2, Animation, Particle, Projectile, Rectangle) {
+define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Particle", "Projectile", "Rectangle", "Civilian"],
+	function(Compose, Logger, Background, Random, Vector2, Animation, Particle, Projectile, Rectangle, Civilian) {
 	
 	var Building = Compose(function constructor(game, position) {
 		this.game = game;
@@ -128,6 +128,15 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Pa
 				}
 
 				this.game.removeBuilding(this);
+
+
+				// spawn random civilians
+				for (var i = 0; i < 15; ++i) {
+					var civ = new Civilian(Random.getInt(this.position - this.buildBlockWidth/2, this.position + this.buildBlockWidth/2));
+					civ.init(this.game);
+					this.game.addActor(civ);
+					this.game.civilians.push(civ);
+				}
 			}
 		},
 
