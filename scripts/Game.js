@@ -139,8 +139,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 				// spawn random civilians
 				for (var i = 0; i < 10; ++i) {
-					var civ = new Civilian(Random.getInt(800, 900));
+					var civ = new Civilian(Random.getInt(2800, 2900));
 					civ.init(this);
+					this.addActor(civ);
 					this.civilians.push(civ);
 				}
 			}
@@ -159,14 +160,14 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		update_karel: function() {
 
 			// update the different keys
-			if (this.isKeyDown('A')) this.dino.issueCommand('moveLeg', 0, false);
-			else if (this.isKeyDown('Z')) this.dino.issueCommand('moveLeg', 0, true);
-			else if (this.isKeyDown('E')) this.dino.issueCommand('moveLeg', 1, false);
-			else if (this.isKeyDown('R')) this.dino.issueCommand('moveLeg', 1, true);
-			else if (this.isKeyDown('Q')) this.dino.issueCommand('moveLeg', 3, false);
-			else if (this.isKeyDown('S')) this.dino.issueCommand('moveLeg', 3, true);
-			else if (this.isKeyDown('D')) this.dino.issueCommand('moveLeg', 2, false);
-			else if (this.isKeyDown('F')) this.dino.issueCommand('moveLeg', 2, true);
+			if (this.isKeyDown('E')) this.dino.issueCommand('moveLeg', 0, false);
+			else if (this.isKeyDown('R')) this.dino.issueCommand('moveLeg', 0, true);
+			else if (this.isKeyDown('T')) this.dino.issueCommand('moveLeg', 1, false);
+			else if (this.isKeyDown('Y')) this.dino.issueCommand('moveLeg', 1, true);
+			else if (this.isKeyDown('D')) this.dino.issueCommand('moveLeg', 3, false);
+			else if (this.isKeyDown('F')) this.dino.issueCommand('moveLeg', 3, true);
+			else if (this.isKeyDown('G')) this.dino.issueCommand('moveLeg', 2, false);
+			else if (this.isKeyDown('H')) this.dino.issueCommand('moveLeg', 2, true);
 			if (this.keys['key37']) this.dino.issueCommand('moveHead', new Vector2(-1, 0));
 			if (this.keys['key38']) this.dino.issueCommand('moveHead', new Vector2(0, -1));
 			if (this.keys['key39']) this.dino.issueCommand('moveHead', new Vector2(1, 0));
