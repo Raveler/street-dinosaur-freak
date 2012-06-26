@@ -1,5 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Rectangle", "Civilian", "Chopper"],
-	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Rectangle, Civilian, Chopper) {
+define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color", "Rectangle", "Civilian", "Chopper", "Tank"],
+	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color, Rectangle, Civilian, Chopper, Tank) {
 	
 	var Game = Compose(function constructor() {
 		
@@ -23,6 +23,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		var imagesFileNames=["ground", "buildingBlock1", "buildingBlock2", "buildingBlock3", "buildingBlock4", "buildingBlock5", "buildingBlock6", "buildingTop1", "buildingTop2", "buildingTop3", "buildingTop4", "dinoAnimLegSS", "explosionSS", "BG2", "dino/body", "dino/headClosed", "dino/neckPart", "dino/headOpen",
 				"debri1", "debri2", "debri3", "debri4", "debri5", "debri6", "debri7", "debri8", "rocket", "beam"];
 		imagesFileNames.push("dino/dinoAnimLegSS");
+		imagesFileNames.push("dino/tail");
+		imagesFileNames.push("dino/headClosedLaser");
+		imagesFileNames.push("dino/headOpenLaser");
 		imagesFileNames.push("human/civilianSS");
 		imagesFileNames.push("human/heliSS");
 		imagesFileNames.push("human/civilian1SS");
@@ -79,6 +82,16 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 		// objects
 		this.civilians = new Array();
+
+		// enemies
+		this.enemies = new Array();
+
+		// enemies heuristics
+		this.minEnemies = 10;
+		this.maxEnemies = 30;
+		this.maxEnemiesTime = 240; 
+		this.tankChance = 0.7;
+		this.chopperChance = 0.3;
 
 		// keys
 		this.keys = {};
@@ -141,14 +154,6 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				this.startTime = new Date().getTime();
 				this.dino.init(this);
 				this.firstTime = false;
-
-				// spawn random civilians
-				for (var i = 0; i < 10; ++i) {
-					var civ = new Civilian(Random.getInt(2800, 2900));
-					civ.init(this);
-					this.addActor(civ);
-					this.civilians.push(civ);
-				}
 			}
 
 			this.update_dave();
@@ -156,6 +161,9 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 			// Handle mouse events
 			this.handleMouseClick();
+
+			// Spawn actors
+			this.spawnActors();
 		},
 
 		isKeyDown: function(c) {
@@ -215,16 +223,24 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			var width = health / 100 * (this.width-108);
 			ctx.fillRect(54, 54, width, 42);
 
+			// draw laser charge
+			var laser = this.dino.neck.getLaserChargePct();
+			ctx.fillStyle = "#000000";
+			ctx.fillRect(50, 100, this.width-100, 12);
+			ctx.fillStyle = "#FF00FF";
+			ctx.fillRect(54, 100, (this.width-108) * laser, 8);
+
 			// time survived
 			ctx.fillStyle = "#000000";
-			var surviveTime = (new Date().getTime() - this.startTime) / 1000;
+			var surviveTime = this.getSurviveTime();
 			ctx.font = "30px Arial";
 			ctx.fillText("Time survived: " + surviveTime + "s", 60, 85);
 
 		},
 
-
-
+		getSurviveTime: function() {
+			return (new Date().getTime() - this.startTime) / 1000;
+		},
 
         loadImages: function(fileNames) {
         	this.images = new Array();
@@ -261,9 +277,6 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			var ctx = this.canvas.getContext('2d');
 			ctx.save();
 			ctx.translate(-this.worldPosition, 0);
-
-			// Spawn actors
-			this.spawnActors();
 
 			// Draw the background
 			ctx.drawImage(this.images["BG2"], this.worldPosition - (Math.floor(this.worldPosition / 3) % this.width), 0);
@@ -365,7 +378,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			//var projectile = new Projectile(this, "beam", this.MousePosition, angle, 0.75, 3.5, true);
 			//this.addProjectile(projectile);
 
-			this.addActor(new Chopper(this, this.MousePosition));
+			//this.addActor(new Chopper(this, this.MousePosition));
 		},
 
 
@@ -402,8 +415,31 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			}
 		},
 
-		spawnActors: function(actor) {
-			// TODO heuristic generation of actorstuffings
+		spawnActors: function() {
+
+			// determine the number of max enemies based on the survive time
+			var maxEnemies = this.minEnemies + (this.maxEnemies - this.minEnemies) * (this.getSurviveTime() / this.maxEnemiesTime);
+			if (maxEnemies > this.maxEnemies) maxEnemies = this.maxEnemies;
+
+			// generate more enemies
+			var nNew = maxEnemies - this.enemies.length;
+			while (--nNew >= 0) {
+				var loc = new Vector2(this.worldPosition + this.width + Random.getInt(0, 150), 0);
+				Logger.log(loc);
+				var pick = Random.getDouble();
+				if (pick <= this.tankChance) {
+					/*var tank = new Tank(this, loc);
+					this.enemies.push(tank);*/
+				}
+				pick -= this.tankChance;
+				if (pick <= this.chopperChance) {
+					loc.y = Random.getInt(400, 700);
+					var chopper = new Chopper(this, loc);
+					this.enemies.push(chopper);
+					this.addActor(chopper);
+				}
+				pick -= this.chopperChance;
+			}
 		},
 
 		// TODO only add if list not above max size

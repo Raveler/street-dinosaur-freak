@@ -90,6 +90,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 			this.game.addAnimation(animation);
 
 			this.game.stopActor(this);
+			this.game.enemies.splice(this.game.enemies.indexOf(this), 1);
 
 			//var animation = new Animation(this.game, "bloodSausageSS",  1.0, this.getLoc());
 			//var animation = new Animation(this.game, "bloodSausageSS", 0.1, Random.getInt(0, 360), this.getLoc());
