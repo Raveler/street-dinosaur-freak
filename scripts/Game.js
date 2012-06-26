@@ -106,6 +106,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		update: function() {
 
 			if (!(this.imagesPending == 0) || !(this.jsonPending == 0)) {
+				this.mousePressed = false;
 				return;
 			}
 
@@ -123,10 +124,10 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 
 			//this.update_karel();
-			//this.update_dave();
+			this.update_dave();
 
 			// Handle mouse events
-			//this.handleMouseClick();
+			this.handleMouseClick();
 		},
 
 		isKeyDown: function(c) {
