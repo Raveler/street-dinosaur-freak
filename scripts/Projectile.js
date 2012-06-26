@@ -1,6 +1,9 @@
 define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle", "Animation"], function(Compose, Logger, Background, Random, Vector2, Rectangle, Animation) {
 
+	var deleteThreshold = 1000;
+
 	var Projectile = Compose(function constructor(game, imageName, point, rotation, scale, velocity, dinoProjectile, damage) {
+		this.damage = damage;
 		this.game = game;
 		this.image = this.game.images[imageName];
 
@@ -11,7 +14,6 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle", "An
 		this.rotation = rotation;
 		this.scale = scale;
 		this.velocity = velocity;
-		this.damage = damage;
 
 		this.dinoProjectile = dinoProjectile; // TODO implement
 	},
@@ -22,7 +24,9 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle", "An
 			this.position.y += Math.sin(this.rotation) * this.velocity;
 
 			if ((this.position.y > this.game.height)
-				|| (this.position.y < (0 - this.height))) {
+				|| (this.position.y < (0 - this.height))
+				|| (this.position.x < (this.game.worldPosition - deleteThreshold))
+				|| (this.position.x > (this.game.worldPosition + deleteThreshold))) {
 				this.game.stopProjectile(this);
 				return;
 			}

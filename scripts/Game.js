@@ -28,6 +28,7 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		imagesFileNames.push("dino/headOpenLaser");
 		imagesFileNames.push("human/civilianSS");
 		imagesFileNames.push("human/heliSS");
+		imagesFileNames.push("human/tankSS");
 		imagesFileNames.push("human/civilian1SS");
 		imagesFileNames.push("human/civilian2SS");
 		imagesFileNames.push("human/civilian3SS");
@@ -52,10 +53,11 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 		jsonFileNames.push("dino/dinoAnimLeg");
 		jsonFileNames.push("human/civilianSS");
 		jsonFileNames.push("human/heliSS");
-		imagesFileNames.push("human/civilian1SS");
-		imagesFileNames.push("human/civilian2SS");
-		imagesFileNames.push("human/civilian3SS");
-		imagesFileNames.push("human/civilian4SS");
+		jsonFileNames.push("human/tankSS");
+		//jsonFileNames.push("human/civilian1SS");
+		//jsonFileNames.push("human/civilian2SS");
+		//jsonFileNames.push("human/civilian3SS");
+		//jsonFileNames.push("human/civilian4SS");
 		jsonFileNames.push("bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausageSS");
 		jsonFileNames.push("debris/bloodSausage2SS");
@@ -289,8 +291,15 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				}
 
 				this.buildings[i].draw(ctx, this.worldPosition);
+			}	
+			// Check for collisions with projectiles
+			for(var i = 0; i < this.buildings.length; i++) {
+				if (!this.buildings[i].isVisible(this.worldPosition)) {
+					continue;
+				}
 
-				// Check for collisions with projectiles
+				this.buildings[i].draw(ctx, this.worldPosition);
+
 				var collisionShape = this.buildings[i].getCollisionShape();
 				for(var i2 = 0; i2 < this.projectiles.length; i2++) {
 					if (this.projectiles[i2].dinoProjectile) {
@@ -333,11 +342,20 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				this.actors[m].draw(ctx);
 			}
 			for(var m = 0; m < this.actors.length; m++) {
-				this.actors[m].update();
+				// Check for collisions with projectiles
+				var collisionShape = this.actors[m].getCollisionShape();
+				for(var m2 = 0; m2 < this.projectiles.length; m2++) {
+					if (this.projectiles[m2].dinoProjectile) {
+						if (this.projectiles[m2].getCollisionShape().collidesWith(collisionShape)) {
+							this.actors[m].handleDamage(this.projectiles[m2].getDamage(), this.projectiles[m2].position);
+							this.projectiles[m2].handleDamage();
+						}
+					}
+				}
 			}
-
-			// TODO tmp
-			//this.worldPosition += 1
+			for(var m = 0; m < this.actors.length; m++) {
+				this.actors[m].update();					
+			}
 
 			ctx.restore();
 		},
@@ -368,17 +386,6 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 			this.dino.processClick(this.MousePosition);
 
 			this.mousePressed = false;
-
-
-			// TODO tmp
-			/*p2 = new Vector2(0, 300);
-			var angle = Math.atan2(p2.y - this.MousePosition.y, p2.x - this.MousePosition.x)
-			var projectile = new Projectile(this, "rocket", this.MousePosition, angle, 1.00, 3.5, true);
-			this.addProjectile(projectile);*/
-			//var projectile = new Projectile(this, "beam", this.MousePosition, angle, 0.75, 3.5, true);
-			//this.addProjectile(projectile);
-
-			//this.addActor(new Chopper(this, this.MousePosition));
 		},
 
 
@@ -423,17 +430,21 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 
 			// generate more enemies
 			var nNew = maxEnemies - this.enemies.length;
+			if (nNew > 1) nNew = 1;
 			while (--nNew >= 0) {
 				var loc = new Vector2(this.worldPosition + this.width + Random.getInt(0, 150), 0);
 				Logger.log(loc);
 				var pick = Random.getDouble();
 				if (pick <= this.tankChance) {
-					/*var tank = new Tank(this, loc);
-					this.enemies.push(tank);*/
+					var tank = new Tank(this, loc);
+					//var tank = new Tank(this, new Vector2(this.worldPosition + this.width + 50, 0));
+					Logger.log('add tank at ' + loc.toString());
+					this.enemies.push(tank);
+					this.addActor(tank);
 				}
-				pick -= this.tankChance;
+				pick += this.tankChance;
 				if (pick <= this.chopperChance) {
-					loc.y = Random.getInt(400, 700);
+					loc.y = Random.getInt(250, 400);
 					var chopper = new Chopper(this, loc);
 					this.enemies.push(chopper);
 					this.addActor(chopper);
