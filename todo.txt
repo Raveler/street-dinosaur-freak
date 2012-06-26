@@ -1,6 +1,6 @@
 TODO:
-- azerty/qwerty -> erty dfgh
-- projectiles checken tegen dino
+* azerty/qwerty -> erty dfgh
+* projectiles checken tegen dino
 - laser minder OP maken
 - voorkomen da ge te veel achteruit kunt
 - staart adden

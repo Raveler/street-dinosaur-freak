@@ -206,7 +206,7 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 			clickPos.x += this.game.worldPosition;
 			var headLoc = this.getHeadLoc();
 			var angle = Math.atan2(clickPos.y - headLoc.y, clickPos.x - headLoc.x);
-			var projectile = new Projectile(this.game, "dino/beam", headLoc, angle, 1.00, 3.5, true);
+			var projectile = new Projectile(this.game, "dino/beam", headLoc, angle, 1.00, 3.5, true, 5);
 			this.game.addProjectile(projectile);
 		}
 	});

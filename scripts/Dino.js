@@ -86,6 +86,12 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 				var civ = this.game.civilians[i];
 				this.processCollision(civ, false, true);
 			}
+
+			// projectiles
+			for (var i = 0; i < this.game.projectiles.length; ++i) {
+				var obj = this.game.projectiles[i];
+				if (!obj.dinoProjectile) this.processCollision(obj, false, false);
+			}
 		},
 
 		draw: function(ctx) {

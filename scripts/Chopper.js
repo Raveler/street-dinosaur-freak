@@ -29,7 +29,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Pro
 				//var target = new Vector2(this.position.x - 10, this.position.y - 10);
 				var target = this.game.dino.getLoc();
 				var angle = Math.atan2(this.position.y - target.y, target.x - this.position.x);
-				var projectile = new Projectile(this.game, "rocket", this.position, -angle, 1.00, 3.5, false);
+				var projectile = new Projectile(this.game, "rocket", this.position, -angle, 1.00, 3.5, false, 1);
 				this.game.addProjectile(projectile);
 
 				this.missileCooldown = 120;

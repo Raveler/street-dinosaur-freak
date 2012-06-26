@@ -1,6 +1,6 @@
 define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle", "Animation"], function(Compose, Logger, Background, Random, Vector2, Rectangle, Animation) {
 
-	var Projectile = Compose(function constructor(game, imageName, point, rotation, scale, velocity, dinoProjectile) {
+	var Projectile = Compose(function constructor(game, imageName, point, rotation, scale, velocity, dinoProjectile, damage) {
 		this.game = game;
 		this.image = this.game.images[imageName];
 
@@ -11,6 +11,7 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle", "An
 		this.rotation = rotation;
 		this.scale = scale;
 		this.velocity = velocity;
+		this.damage = damage;
 
 		this.dinoProjectile = dinoProjectile; // TODO implement
 	},
@@ -50,7 +51,7 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Rectangle", "An
 		},
 
 		getDamage: function() {
-			return 5;
+			return this.damage;
 		},
 
 		handleDamage: function(damage) {
