@@ -141,10 +141,10 @@ define(["Compose", "Logger", "Background", "Random", "Vector2", "Animation", "Pa
 
 
 				// spawn random civilians
-				for (var i = 0; i < 15; ++i) {
+				for (var i = 0; i < 10; ++i) {
 					var civ = new Civilian(Random.getInt(this.position - this.buildBlockWidth/2, this.position + this.buildBlockWidth/2));
 					civ.init(this.game);
-					this.game.addActor(civ);
+					//this.game.addActor(civ);
 					this.game.civilians.push(civ);
 				}
 			}

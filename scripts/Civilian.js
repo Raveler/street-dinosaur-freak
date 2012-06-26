@@ -61,7 +61,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Par
 			ctx.translate(-this.width/2, -10);
 			ctx.drawImage(this.img, frameOffset, animationOffset, this.width, this.height, 0, 0, this.width, this.height);
 			ctx.restore();
-
+			
 			// next frame
 			--this.frameCounter;
 			if (this.frameCounter == 0) {
@@ -71,7 +71,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Par
 		},
 
 		getCollisionShape: function() {
-			return new Rectangle(this.getLoc(), new Vector2(this.x + this.img.width/2, this.game.height - this.game.floorHeight));
+			return new Rectangle(new Vector2(this.getLoc().x, this.getLoc().y - 15), new Vector2(this.x + this.width/2, this.game.height - this.game.floorHeight));
 		},
 
 		getDamage: function() {
@@ -92,6 +92,7 @@ define(["Compose", "Vector2", "Rectangle", "Animation", "Random", "Logger", "Par
 			var animation = new Animation(this.game, "debris/bloodSausage2SS", 1.0, Random.getInt(0, 360), this.getLoc());
 			this.game.addAnimation(animation);
 			this.game.civilians.splice(this.game.animations.indexOf(this), 1);
+			//this.game.stopActor(this);
 			
 			for (var i = 0; i < 10; ++i) {
 				this.generateParticle(this.getLoc().add(new Vector2(Random.getInt(-10, 10), Random.getInt(-10, 10))));

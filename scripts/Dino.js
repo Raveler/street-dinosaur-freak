@@ -78,7 +78,9 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 			}
 
 			// look for a collision
+			Logger.log('Civilians: ' + this.game.civilians.length);
 			for (var i = 0; i < this.game.civilians.length; ++i) {
+				Logger.log('Civilians: ' + this.game.civilians.length);
 				var civ = this.game.civilians[i];
 				this.processCollision(civ, false, true, false);
 			}
@@ -153,7 +155,10 @@ define(["Compose", "Logger", "Vector2", "DinoLeg", "DinoNeck", "Controller", "Re
 			// look for bite collision - this does extra damage
 			if (this.neck.isBiteCollision(rect)) {
 				obj.handleDamage(this.biteDamage, this.neck.getHeadLoc());
-				if (healing) this.health += this.biteHeal;
+				if (healing) {
+					this.health += this.biteHeal;
+					if (this.health > 100) this.health = 100;
+				}
 				else if (!noDamageOnBite) this.health -= obj.getDamage();
 			}
 

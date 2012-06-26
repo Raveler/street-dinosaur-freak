@@ -137,6 +137,17 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 			ctx.drawImage(img, 0, 0);
 			ctx.restore();
 
+
+			/*ctx.save();
+
+			var headLoc = this.headLoc;
+			Logger.log(headLoc);
+			ctx.strokeStyle = "#00FFFF";
+			ctx.strokeRect(headLoc.x - this.headOpenImg.width/2, headLoc.y - this.headOpenImg.height/2, this.headOpenImg.width, this.headOpenImg.height);
+			
+			ctx.restore();*/
+
+
 			--this.laserDraw;
 			if (this.laserDraw <= 0) this.laserDraw = 0;
 		},
@@ -234,7 +245,7 @@ define(["Compose", "Logger", "Vector2", "Controller", "Bezier", "Projectile"], f
 			clickPos.x += this.game.worldPosition;
 			var headLoc = this.getHeadLoc();
 			var angle = Math.atan2(clickPos.y - headLoc.y, clickPos.x - headLoc.x);
-			var projectile = new Projectile(this.game, "dino/beam", headLoc, angle, 1.00, 3.5, true, 5);
+			var projectile = new Projectile(this.game, "dino/beam", headLoc, angle, 1.00, 3.5, true, 5);//5
 			this.game.addProjectile(projectile);
 		}
 	});
