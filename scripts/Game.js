@@ -1,5 +1,5 @@
-define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile"],
-	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile) {
+define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Dino", "Animation", "Particle", "Projectile", "Color"],
+	function(Compose, Logger, Background, Random, Building, Vector2, Dino, Animation, Particle, Projectile, Color) {
 	
 	var Game = Compose(function constructor() {
 		
@@ -114,19 +114,18 @@ define(["Compose", "Logger", "Background", "Random", "Building", "Vector2", "Din
 				this.firstTime = false;
 
 				// spawn random civilians
-			/*	for (var i = 0; i < 10; ++i) {
+				for (var i = 0; i < 10; ++i) {
 					var civ = new Civilian(Random.getInt(0, this.width));
 					civ.init(this);
 					this.civilians.push(civ);
-				}*/
+				}
 			}
 
-
-			//this.update_karel();
+			this.update_karel();
 			//this.update_dave();
 
 			// Handle mouse events
-			//this.handleMouseClick();
+			this.handleMouseClick();
 		},
 
 		isKeyDown: function(c) {
